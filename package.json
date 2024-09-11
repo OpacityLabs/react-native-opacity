@@ -194,6 +194,6 @@
   "create-react-native-library": {
     "type": "module-new",
     "languages": "cpp",
-    "version": "3.3.0"
+    "version": "0.41.1"
   }
 }
