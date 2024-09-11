@@ -1,5 +1,5 @@
 {
-  "name": "react-native-opacity",
+  "name": "@opacity-labs/react-native-opacity",
   "version": "0.1.0",
   "description": "Opacity Networks library for React Native",
   "source": "./src/index.tsx",
