@@ -183,7 +183,10 @@
   "codegenConfig": {
     "name": "RNOpacitySpec",
     "type": "modules",
-    "jsSrcsDir": "src"
+    "jsSrcsDir": "src",
+    "outputDir": {
+      "android": "android/generated"
+    }
   },
   "create-react-native-library": {
     "type": "module-new",
