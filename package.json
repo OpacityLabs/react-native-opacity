@@ -182,16 +182,8 @@
   },
   "codegenConfig": {
     "name": "RNOpacitySpec",
-    "type": "all",
-    "jsSrcsDir": "src",
-    "outputDir": {
-      "ios": "ios/generated",
-      "android": "android/generated"
-    },
-    "android": {
-      "javaPackageName": "com.opacity"
-    },
-    "includesGeneratedCode": true
+    "type": "modules",
+    "jsSrcsDir": "src"
   },
   "create-react-native-library": {
     "type": "module-new",

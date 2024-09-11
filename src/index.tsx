@@ -1,5 +1,9 @@
 const Opacity = require('./NativeOpacity').default;
 
-export function multiply(a: number, b: number): number {
-  return Opacity.multiply(a, b);
+export function init(apiKey: string, dryRun: boolean): void {
+  return Opacity.init(apiKey, dryRun);
+}
+
+export function getUberRiderPorfile(): Promise<string> {
+  return Opacity.getRiderProfile();
 }
