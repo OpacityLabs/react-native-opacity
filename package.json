@@ -1,6 +1,6 @@
 {
   "name": "@opacity-labs/react-native-opacity",
-  "version": "0.1.0",
+  "version": "3.2.0",
   "description": "Opacity Networks library for React Native",
   "source": "./src/index.tsx",
   "main": "./lib/commonjs/index.js",
@@ -188,6 +188,6 @@
   "create-react-native-library": {
     "type": "module-new",
     "languages": "cpp",
-    "version": "0.41.1"
+    "version": "3.2.0"
   }
 }
