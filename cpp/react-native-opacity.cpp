@@ -16,29 +16,397 @@ void NativeOpacityTurboModule::init(jsi::Runtime &rt, std::string api_key,
 }
 
 jsi::Value NativeOpacityTurboModule::getRiderProfile(jsi::Runtime &rt) {
-
   jsi::Function promiseConstructor =
       rt.global().getPropertyAsFunction(rt, "Promise");
-
   return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
     auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
-    std::thread([resolve = std::move(resolve), jsInvoker = jsInvoker_, &rt]() {
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt]() {
       char *json;
       char *proof;
       char *err;
 
       int status = opacity_core::get_rider_profile(&json, &proof, &err);
 
-      if (status != opacity_core::OPACITY_OK) {
+      if (status == opacity_core::OPACITY_OK) {
         jsInvoker->invokeAsync([&rt, resolve, json] {
-          auto js_json = jsi::String::createFromUtf8(rt, json);
-          resolve->asObject(rt).asFunction(rt).call(rt, js_json);
+          auto data = jsi::String::createFromUtf8(rt, json);
+          auto proof = jsi::String::createFromUtf8(rt, "");
+          auto res = jsi::Object(rt);
+          res.setProperty(rt, "data", data);
+          res.setProperty(rt, "proof", proof);
+          resolve->asObject(rt).asFunction(rt).call(rt, res);
         });
-        return;
-      }
+      } else {
+        jsInvoker->invokeAsync([&rt, reject, err] {
+          auto errorCtr = rt.global().getPropertyAsFunction(rt, "Error");
+          auto error = errorCtr.callAsConstructor(
+              rt, jsi::String::createFromUtf8(rt, err));
+          reject->asObject(rt).asFunction(rt).call(rt, error);
+        });
+      };
+      return;
     }).detach();
     return {};
   }));
 }
+
+jsi::Value NativeOpacityTurboModule::getRiderTripHistory(jsi::Runtime &rt, double limit, double offset) {
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
+
+  return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt, &limit, &offset]() {
+      char *json;
+      char *proof;
+      char *err;
+
+      int status = opacity_core::get_rider_trip_history(limit, offset, &json, &proof, &err);
+
+      if (status == opacity_core::OPACITY_OK) {
+        jsInvoker->invokeAsync([&rt, resolve, json] {
+          auto data = jsi::String::createFromUtf8(rt, json);
+          auto proof = jsi::String::createFromUtf8(rt, "");
+          auto res = jsi::Object(rt);
+          res.setProperty(rt, "data", data);
+          res.setProperty(rt, "proof", proof);
+          resolve->asObject(rt).asFunction(rt).call(rt, res);
+        });
+      } else {
+        jsInvoker->invokeAsync([&rt, reject, err] {
+          auto errorCtr = rt.global().getPropertyAsFunction(rt, "Error");
+          auto error = errorCtr.callAsConstructor(
+              rt, jsi::String::createFromUtf8(rt, err));
+          reject->asObject(rt).asFunction(rt).call(rt, error);
+        });
+      };
+      return;
+    }).detach();
+    return {};
+  }));
+}
+
+jsi::Value NativeOpacityTurboModule::getRiderTrip(jsi::Runtime &rt, jsi::String id) {
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
+  auto id_str = id.utf8(rt);
+  return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt, &id_str]() {
+      char *json;
+      char *proof;
+      char *err;
+
+      int status = opacity_core::get_rider_trip(id_str.c_str(), &json, &proof, &err);
+
+      if (status == opacity_core::OPACITY_OK) {
+        jsInvoker->invokeAsync([&rt, resolve, json] {
+          auto data = jsi::String::createFromUtf8(rt, json);
+          auto proof = jsi::String::createFromUtf8(rt, "");
+          auto res = jsi::Object(rt);
+          res.setProperty(rt, "data", data);
+          res.setProperty(rt, "proof", proof);
+          resolve->asObject(rt).asFunction(rt).call(rt, res);
+        });
+      } else {
+        jsInvoker->invokeAsync([&rt, reject, err] {
+          auto errorCtr = rt.global().getPropertyAsFunction(rt, "Error");
+          auto error = errorCtr.callAsConstructor(
+              rt, jsi::String::createFromUtf8(rt, err));
+          reject->asObject(rt).asFunction(rt).call(rt, error);
+        });
+      };
+      return;
+    }).detach();
+    return {};
+  }));
+};
+jsi::Value NativeOpacityTurboModule::getDriverProfile(jsi::Runtime &rt) {
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
+  return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt]() {
+      char *json;
+      char *proof;
+      char *err;
+
+      int status = opacity_core::get_driver_profile(&json, &proof, &err);
+
+      if (status == opacity_core::OPACITY_OK) {
+        jsInvoker->invokeAsync([&rt, resolve, json] {
+          auto data = jsi::String::createFromUtf8(rt, json);
+          auto proof = jsi::String::createFromUtf8(rt, "");
+          auto res = jsi::Object(rt);
+          res.setProperty(rt, "data", data);
+          res.setProperty(rt, "proof", proof);
+          resolve->asObject(rt).asFunction(rt).call(rt, res);
+        });
+      } else {
+        jsInvoker->invokeAsync([&rt, reject, err] {
+          auto errorCtr = rt.global().getPropertyAsFunction(rt, "Error");
+          auto error = errorCtr.callAsConstructor(
+              rt, jsi::String::createFromUtf8(rt, err));
+          reject->asObject(rt).asFunction(rt).call(rt, error);
+        });
+      };
+      return;
+    }).detach();
+    return {};
+  }));
+};
+jsi::Value NativeOpacityTurboModule::getDriverTrips(jsi::Runtime &rt, jsi::String startDate, jsi::String endDate, jsi::String cursor) {
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
+  auto startDate_str = startDate.utf8(rt);
+  auto endDate_str = endDate.utf8(rt);
+  auto cursor_str = cursor.utf8(rt);
+  return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt, &startDate_str, &endDate_str, &cursor_str]() {
+      char *json;
+      char *proof;
+      char *err;
+
+      int status = opacity_core::get_driver_trips(startDate_str.c_str(), endDate_str.c_str(), cursor_str.c_str(), &json, &proof, &err);
+
+      if (status == opacity_core::OPACITY_OK) {
+        jsInvoker->invokeAsync([&rt, resolve, json] {
+          auto data = jsi::String::createFromUtf8(rt, json);
+          auto proof = jsi::String::createFromUtf8(rt, "");
+          auto res = jsi::Object(rt);
+          res.setProperty(rt, "data", data);
+          res.setProperty(rt, "proof", proof);
+          resolve->asObject(rt).asFunction(rt).call(rt, res);
+        });
+      } else {
+        jsInvoker->invokeAsync([&rt, reject, err] {
+          auto errorCtr = rt.global().getPropertyAsFunction(rt, "Error");
+          auto error = errorCtr.callAsConstructor(
+              rt, jsi::String::createFromUtf8(rt, err));
+          reject->asObject(rt).asFunction(rt).call(rt, error);
+        });
+      };
+      return;
+    }).detach();
+    return {};
+  }));
+}
+
+jsi::Value NativeOpacityTurboModule::getRedditAccount(jsi::Runtime &rt) {
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
+  return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt]() {
+      char *json;
+      char *proof;
+      char *err;
+
+      int status = opacity_core::get_reddit_account(&json, &proof, &err);
+
+      if (status == opacity_core::OPACITY_OK) {
+        jsInvoker->invokeAsync([&rt, resolve, json] {
+          auto data = jsi::String::createFromUtf8(rt, json);
+          auto proof = jsi::String::createFromUtf8(rt, "");
+          auto res = jsi::Object(rt);
+          res.setProperty(rt, "data", data);
+          res.setProperty(rt, "proof", proof);
+          resolve->asObject(rt).asFunction(rt).call(rt, res);
+        });
+      } else {
+        jsInvoker->invokeAsync([&rt, reject, err] {
+          auto errorCtr = rt.global().getPropertyAsFunction(rt, "Error");
+          auto error = errorCtr.callAsConstructor(
+              rt, jsi::String::createFromUtf8(rt, err));
+          reject->asObject(rt).asFunction(rt).call(rt, error);
+        });
+      };
+      return;
+    }).detach();
+    return {};
+  }));
+};
+jsi::Value NativeOpacityTurboModule::getRedditFollowedSubreddits(jsi::Runtime &rt) {
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
+  return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt]() {
+      char *json;
+      char *proof;
+      char *err;
+
+      int status = opacity_core::get_reddit_followed_subreddits(&json, &proof, &err);
+
+      if (status == opacity_core::OPACITY_OK) {
+        jsInvoker->invokeAsync([&rt, resolve, json] {
+          auto data = jsi::String::createFromUtf8(rt, json);
+          auto proof = jsi::String::createFromUtf8(rt, "");
+          auto res = jsi::Object(rt);
+          res.setProperty(rt, "data", data);
+          res.setProperty(rt, "proof", proof);
+          resolve->asObject(rt).asFunction(rt).call(rt, res);
+        });
+      } else {
+        jsInvoker->invokeAsync([&rt, reject, err] {
+          auto errorCtr = rt.global().getPropertyAsFunction(rt, "Error");
+          auto error = errorCtr.callAsConstructor(
+              rt, jsi::String::createFromUtf8(rt, err));
+          reject->asObject(rt).asFunction(rt).call(rt, error);
+        });
+      };
+      return;
+    }).detach();
+    return {};
+  }));
+};
+jsi::Value NativeOpacityTurboModule::getRedditCommets(jsi::Runtime &rt) {
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
+  return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt]() {
+      char *json;
+      char *proof;
+      char *err;
+
+      int status = opacity_core::get_reddit_comments(&json, &proof, &err);
+
+      if (status == opacity_core::OPACITY_OK) {
+        jsInvoker->invokeAsync([&rt, resolve, json] {
+          auto data = jsi::String::createFromUtf8(rt, json);
+          auto proof = jsi::String::createFromUtf8(rt, "");
+          auto res = jsi::Object(rt);
+          res.setProperty(rt, "data", data);
+          res.setProperty(rt, "proof", proof);
+          resolve->asObject(rt).asFunction(rt).call(rt, res);
+        });
+      } else {
+        jsInvoker->invokeAsync([&rt, reject, err] {
+          auto errorCtr = rt.global().getPropertyAsFunction(rt, "Error");
+          auto error = errorCtr.callAsConstructor(
+              rt, jsi::String::createFromUtf8(rt, err));
+          reject->asObject(rt).asFunction(rt).call(rt, error);
+        });
+      };
+      return;
+    }).detach();
+    return {};
+  }));
+};
+jsi::Value NativeOpacityTurboModule::getRedditPosts(jsi::Runtime &rt) {
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
+  return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt]() {
+      char *json;
+      char *proof;
+      char *err;
+
+      int status = opacity_core::get_reddit_posts(&json, &proof, &err);
+
+      if (status == opacity_core::OPACITY_OK) {
+        jsInvoker->invokeAsync([&rt, resolve, json] {
+          auto data = jsi::String::createFromUtf8(rt, json);
+          auto proof = jsi::String::createFromUtf8(rt, "");
+          auto res = jsi::Object(rt);
+          res.setProperty(rt, "data", data);
+          res.setProperty(rt, "proof", proof);
+          resolve->asObject(rt).asFunction(rt).call(rt, res);
+        });
+      } else {
+        jsInvoker->invokeAsync([&rt, reject, err] {
+          auto errorCtr = rt.global().getPropertyAsFunction(rt, "Error");
+          auto error = errorCtr.callAsConstructor(
+              rt, jsi::String::createFromUtf8(rt, err));
+          reject->asObject(rt).asFunction(rt).call(rt, error);
+        });
+      };
+      return;
+    }).detach();
+    return {};
+  }));
+};
+jsi::Value NativeOpacityTurboModule::zabkaGetAccount(jsi::Runtime &rt) {
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
+  return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt]() {
+      char *json;
+      char *proof;
+      char *err;
+
+      int status = opacity_core::zabka_get_account(&json, &proof, &err);
+
+      if (status == opacity_core::OPACITY_OK) {
+        jsInvoker->invokeAsync([&rt, resolve, json] {
+          auto data = jsi::String::createFromUtf8(rt, json);
+          auto proof = jsi::String::createFromUtf8(rt, "");
+          auto res = jsi::Object(rt);
+          res.setProperty(rt, "data", data);
+          res.setProperty(rt, "proof", proof);
+          resolve->asObject(rt).asFunction(rt).call(rt, res);
+        });
+      } else {
+        jsInvoker->invokeAsync([&rt, reject, err] {
+          auto errorCtr = rt.global().getPropertyAsFunction(rt, "Error");
+          auto error = errorCtr.callAsConstructor(
+              rt, jsi::String::createFromUtf8(rt, err));
+          reject->asObject(rt).asFunction(rt).call(rt, error);
+        });
+      };
+      return;
+    }).detach();
+    return {};
+  }));
+};
+jsi::Value NativeOpacityTurboModule::zabkaGetPoints(jsi::Runtime &rt) {
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
+  return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt]() {
+      char *json;
+      char *proof;
+      char *err;
+
+      int status = opacity_core::zabka_get_points(&json, &proof, &err);
+
+      if (status == opacity_core::OPACITY_OK) {
+        jsInvoker->invokeAsync([&rt, resolve, json] {
+          auto data = jsi::String::createFromUtf8(rt, json);
+          auto proof = jsi::String::createFromUtf8(rt, "");
+          auto res = jsi::Object(rt);
+          res.setProperty(rt, "data", data);
+          res.setProperty(rt, "proof", proof);
+          resolve->asObject(rt).asFunction(rt).call(rt, res);
+        });
+      } else {
+        jsInvoker->invokeAsync([&rt, reject, err] {
+          auto errorCtr = rt.global().getPropertyAsFunction(rt, "Error");
+          auto error = errorCtr.callAsConstructor(
+              rt, jsi::String::createFromUtf8(rt, err));
+          reject->asObject(rt).asFunction(rt).call(rt, error);
+        });
+      };
+      return;
+    }).detach();
+    return {};
+  }));
+};
 
 } // namespace facebook::react

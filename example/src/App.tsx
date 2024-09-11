@@ -4,7 +4,6 @@ import { getUberRiderPorfile, init } from 'react-native-opacity';
 
 export default function App() {
   useEffect(() => {
-    console.warn(JSON.stringify(process.env));
     init(process.env.OPACITY_API_KEY!, false);
   }, []);
 
