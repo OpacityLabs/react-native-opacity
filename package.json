@@ -186,7 +186,8 @@
     "jsSrcsDir": "src",
     "outputDir": {
       "android": "android/generated"
-    }
+    },
+    "javaPackageName": "com.opacity"
   },
   "create-react-native-library": {
     "type": "module-new",
