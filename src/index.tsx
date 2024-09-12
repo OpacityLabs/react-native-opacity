@@ -1,56 +1,61 @@
-const Opacity = require('./NativeOpacity').default;
+import Opacity from './NativeOpacity';
+
+type WorkflowResponse = {
+  data: string;
+  proof: string;
+};
 
 export function init(apiKey: string, dryRun: boolean): void {
   return Opacity.init(apiKey, dryRun);
 }
 
-export function getUberRiderPorfile(): Promise<string> {
-  return Opacity.getRiderProfile();
+export function getUberRiderPorfile(): Promise<WorkflowResponse> {
+  return Opacity.getUberRiderProfile();
 }
 
 export function getUberRiderTripHistory(
   limit: number,
   offset: number
-): Promise<string> {
-  return Opacity.getRiderTripHistory(limit, offset);
+): Promise<WorkflowResponse> {
+  return Opacity.getUberRiderTripHistory(limit, offset);
 }
 
-export function getUberRiderTrip(id: string): Promise<string> {
-  return Opacity.getRiderTrip(id);
+export function getUberRiderTrip(id: string): Promise<WorkflowResponse> {
+  return Opacity.getUberRiderTrip(id);
 }
 
-export function getUberDriverProfile(): Promise<string> {
-  return Opacity.getDriverProfile();
+export function getUberDriverProfile(): Promise<WorkflowResponse> {
+  return Opacity.getUberDriverProfile();
 }
 
 export function getUberDriverTrips(
   startDate: string,
   endDate: string,
   cursor: string
-): Promise<string> {
-  return Opacity.getDriverTrips(startDate, endDate, cursor);
+): Promise<WorkflowResponse> {
+  return Opacity.getUberDriverTrips(startDate, endDate, cursor);
 }
 
-export function getRedditAccount(): Promise<string> {
+export function getRedditAccount(): Promise<WorkflowResponse> {
   return Opacity.getRedditAccount();
 }
 
-export function getRedditFollowedSubreddits(): Promise<string> {
+export function getRedditFollowedSubreddits(): Promise<WorkflowResponse> {
   return Opacity.getRedditFollowedSubreddits();
 }
 
-export function getRedditCommets(): Promise<string> {
+export function getRedditCommets(): Promise<WorkflowResponse> {
   return Opacity.getRedditCommets();
 }
 
-export function getRedditPosts(): Promise<string> {
+export function getRedditPosts(): Promise<WorkflowResponse> {
   return Opacity.getRedditPosts();
 }
 
-export function getZabkaAccount(): Promise<string> {
+export function getZabkaAccount(): Promise<WorkflowResponse> {
   return Opacity.getZabkaAccount();
 }
 
-export function getZabkaPoints(): Promise<string> {
+export function getZabkaPoints(): Promise<WorkflowResponse> {
   return Opacity.getZabkaPoints();
 }

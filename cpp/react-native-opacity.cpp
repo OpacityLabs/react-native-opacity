@@ -5,7 +5,6 @@
 
 namespace facebook::react {
 
-// constructor
 NativeOpacityTurboModule::NativeOpacityTurboModule(
     std::shared_ptr<CallInvoker> jsinvoker)
     : NativeOpacityCxxSpec(std::move(jsinvoker)) {}
@@ -15,7 +14,7 @@ void NativeOpacityTurboModule::init(jsi::Runtime &rt, std::string api_key,
   opacity_core::init(api_key.c_str(), dry_run);
 }
 
-jsi::Value NativeOpacityTurboModule::getRiderProfile(jsi::Runtime &rt) {
+jsi::Value NativeOpacityTurboModule::getUberRiderProfile(jsi::Runtime &rt) {
   jsi::Function promiseConstructor =
       rt.global().getPropertyAsFunction(rt, "Promise");
   return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
@@ -26,7 +25,7 @@ jsi::Value NativeOpacityTurboModule::getRiderProfile(jsi::Runtime &rt) {
       char *proof;
       char *err;
 
-      int status = opacity_core::get_rider_profile(&json, &proof, &err);
+      int status = opacity_core::get_uber_rider_profile(&json, &proof, &err);
 
       if (status == opacity_core::OPACITY_OK) {
         jsInvoker->invokeAsync([&rt, resolve, json] {
@@ -51,19 +50,23 @@ jsi::Value NativeOpacityTurboModule::getRiderProfile(jsi::Runtime &rt) {
   }));
 }
 
-jsi::Value NativeOpacityTurboModule::getRiderTripHistory(jsi::Runtime &rt, double limit, double offset) {
+jsi::Value NativeOpacityTurboModule::getUberRiderTripHistory(jsi::Runtime &rt,
+                                                             double limit,
+                                                             double offset) {
   jsi::Function promiseConstructor =
       rt.global().getPropertyAsFunction(rt, "Promise");
 
   return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
     auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
     auto reject = std::make_shared<jsi::Value>(rt, args[1]);
-    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt, &limit, &offset]() {
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt, &limit,
+                 &offset]() {
       char *json;
       char *proof;
       char *err;
 
-      int status = opacity_core::get_rider_trip_history(limit, offset, &json, &proof, &err);
+      int status = opacity_core::get_uber_rider_trip_history(
+          limit, offset, &json, &proof, &err);
 
       if (status == opacity_core::OPACITY_OK) {
         jsInvoker->invokeAsync([&rt, resolve, json] {
@@ -88,7 +91,8 @@ jsi::Value NativeOpacityTurboModule::getRiderTripHistory(jsi::Runtime &rt, doubl
   }));
 }
 
-jsi::Value NativeOpacityTurboModule::getRiderTrip(jsi::Runtime &rt, jsi::String id) {
+jsi::Value NativeOpacityTurboModule::getUberRiderTrip(jsi::Runtime &rt,
+                                                      jsi::String id) {
   jsi::Function promiseConstructor =
       rt.global().getPropertyAsFunction(rt, "Promise");
   auto id_str = id.utf8(rt);
@@ -100,7 +104,8 @@ jsi::Value NativeOpacityTurboModule::getRiderTrip(jsi::Runtime &rt, jsi::String 
       char *proof;
       char *err;
 
-      int status = opacity_core::get_rider_trip(id_str.c_str(), &json, &proof, &err);
+      int status = opacity_core::get_uber_rider_trip(id_str.c_str(), &json,
+                                                     &proof, &err);
 
       if (status == opacity_core::OPACITY_OK) {
         jsInvoker->invokeAsync([&rt, resolve, json] {
@@ -124,7 +129,8 @@ jsi::Value NativeOpacityTurboModule::getRiderTrip(jsi::Runtime &rt, jsi::String 
     return {};
   }));
 };
-jsi::Value NativeOpacityTurboModule::getDriverProfile(jsi::Runtime &rt) {
+
+jsi::Value NativeOpacityTurboModule::getUberDriverProfile(jsi::Runtime &rt) {
   jsi::Function promiseConstructor =
       rt.global().getPropertyAsFunction(rt, "Promise");
   return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
@@ -135,7 +141,7 @@ jsi::Value NativeOpacityTurboModule::getDriverProfile(jsi::Runtime &rt) {
       char *proof;
       char *err;
 
-      int status = opacity_core::get_driver_profile(&json, &proof, &err);
+      int status = opacity_core::get_uber_driver_profile(&json, &proof, &err);
 
       if (status == opacity_core::OPACITY_OK) {
         jsInvoker->invokeAsync([&rt, resolve, json] {
@@ -159,7 +165,11 @@ jsi::Value NativeOpacityTurboModule::getDriverProfile(jsi::Runtime &rt) {
     return {};
   }));
 };
-jsi::Value NativeOpacityTurboModule::getDriverTrips(jsi::Runtime &rt, jsi::String startDate, jsi::String endDate, jsi::String cursor) {
+
+jsi::Value NativeOpacityTurboModule::getUberDriverTrips(jsi::Runtime &rt,
+                                                        jsi::String startDate,
+                                                        jsi::String endDate,
+                                                        jsi::String cursor) {
   jsi::Function promiseConstructor =
       rt.global().getPropertyAsFunction(rt, "Promise");
   auto startDate_str = startDate.utf8(rt);
@@ -168,12 +178,15 @@ jsi::Value NativeOpacityTurboModule::getDriverTrips(jsi::Runtime &rt, jsi::Strin
   return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
     auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
     auto reject = std::make_shared<jsi::Value>(rt, args[1]);
-    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt, &startDate_str, &endDate_str, &cursor_str]() {
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt, &startDate_str,
+                 &endDate_str, &cursor_str]() {
       char *json;
       char *proof;
       char *err;
 
-      int status = opacity_core::get_driver_trips(startDate_str.c_str(), endDate_str.c_str(), cursor_str.c_str(), &json, &proof, &err);
+      int status = opacity_core::get_uber_driver_trips(
+          startDate_str.c_str(), endDate_str.c_str(), cursor_str.c_str(), &json,
+          &proof, &err);
 
       if (status == opacity_core::OPACITY_OK) {
         jsInvoker->invokeAsync([&rt, resolve, json] {
@@ -233,7 +246,9 @@ jsi::Value NativeOpacityTurboModule::getRedditAccount(jsi::Runtime &rt) {
     return {};
   }));
 };
-jsi::Value NativeOpacityTurboModule::getRedditFollowedSubreddits(jsi::Runtime &rt) {
+
+jsi::Value
+NativeOpacityTurboModule::getRedditFollowedSubreddits(jsi::Runtime &rt) {
   jsi::Function promiseConstructor =
       rt.global().getPropertyAsFunction(rt, "Promise");
   return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
@@ -244,7 +259,8 @@ jsi::Value NativeOpacityTurboModule::getRedditFollowedSubreddits(jsi::Runtime &r
       char *proof;
       char *err;
 
-      int status = opacity_core::get_reddit_followed_subreddits(&json, &proof, &err);
+      int status =
+          opacity_core::get_reddit_followed_subreddits(&json, &proof, &err);
 
       if (status == opacity_core::OPACITY_OK) {
         jsInvoker->invokeAsync([&rt, resolve, json] {
@@ -268,6 +284,7 @@ jsi::Value NativeOpacityTurboModule::getRedditFollowedSubreddits(jsi::Runtime &r
     return {};
   }));
 };
+
 jsi::Value NativeOpacityTurboModule::getRedditCommets(jsi::Runtime &rt) {
   jsi::Function promiseConstructor =
       rt.global().getPropertyAsFunction(rt, "Promise");
@@ -303,6 +320,7 @@ jsi::Value NativeOpacityTurboModule::getRedditCommets(jsi::Runtime &rt) {
     return {};
   }));
 };
+
 jsi::Value NativeOpacityTurboModule::getRedditPosts(jsi::Runtime &rt) {
   jsi::Function promiseConstructor =
       rt.global().getPropertyAsFunction(rt, "Promise");
@@ -338,7 +356,8 @@ jsi::Value NativeOpacityTurboModule::getRedditPosts(jsi::Runtime &rt) {
     return {};
   }));
 };
-jsi::Value NativeOpacityTurboModule::zabkaGetAccount(jsi::Runtime &rt) {
+
+jsi::Value NativeOpacityTurboModule::getZabkaAccount(jsi::Runtime &rt) {
   jsi::Function promiseConstructor =
       rt.global().getPropertyAsFunction(rt, "Promise");
   return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
@@ -349,7 +368,7 @@ jsi::Value NativeOpacityTurboModule::zabkaGetAccount(jsi::Runtime &rt) {
       char *proof;
       char *err;
 
-      int status = opacity_core::zabka_get_account(&json, &proof, &err);
+      int status = opacity_core::get_zabka_account(&json, &proof, &err);
 
       if (status == opacity_core::OPACITY_OK) {
         jsInvoker->invokeAsync([&rt, resolve, json] {
@@ -373,7 +392,7 @@ jsi::Value NativeOpacityTurboModule::zabkaGetAccount(jsi::Runtime &rt) {
     return {};
   }));
 };
-jsi::Value NativeOpacityTurboModule::zabkaGetPoints(jsi::Runtime &rt) {
+jsi::Value NativeOpacityTurboModule::getZabkaPoints(jsi::Runtime &rt) {
   jsi::Function promiseConstructor =
       rt.global().getPropertyAsFunction(rt, "Promise");
   return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
@@ -384,7 +403,7 @@ jsi::Value NativeOpacityTurboModule::zabkaGetPoints(jsi::Runtime &rt) {
       char *proof;
       char *err;
 
-      int status = opacity_core::zabka_get_points(&json, &proof, &err);
+      int status = opacity_core::get_zabka_points(&json, &proof, &err);
 
       if (status == opacity_core::OPACITY_OK) {
         jsInvoker->invokeAsync([&rt, resolve, json] {

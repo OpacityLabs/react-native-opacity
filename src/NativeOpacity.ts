@@ -3,14 +3,14 @@ import { TurboModuleRegistry } from 'react-native';
 
 export interface Spec extends TurboModule {
   init(apiKey: string, dryRun: boolean): void;
-  getRiderProfile(): Promise<{ data: string; proof: string }>;
-  getRiderTripHistory(
+  getUberRiderProfile(): Promise<{ data: string; proof: string }>;
+  getUberRiderTripHistory(
     limit: number,
     offset: number
   ): Promise<{ data: string; proof: string }>;
-  getRiderTrip(id: string): Promise<{ data: string; proof: string }>;
-  getDriverProfile(): Promise<{ data: string; proof: string }>;
-  getDriverTrips(
+  getUberRiderTrip(id: string): Promise<{ data: string; proof: string }>;
+  getUberDriverProfile(): Promise<{ data: string; proof: string }>;
+  getUberDriverTrips(
     startDate: string,
     endDate: string,
     cursor: string
@@ -19,8 +19,8 @@ export interface Spec extends TurboModule {
   getRedditFollowedSubreddits(): Promise<{ data: string; proof: string }>;
   getRedditCommets(): Promise<{ data: string; proof: string }>;
   getRedditPosts(): Promise<{ data: string; proof: string }>;
-  zabkaGetAccount(): Promise<{ data: string; proof: string }>;
-  zabkaGetPoints(): Promise<{ data: string; proof: string }>;
+  getZabkaAccount(): Promise<{ data: string; proof: string }>;
+  getZabkaPoints(): Promise<{ data: string; proof: string }>;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('Opacity');
