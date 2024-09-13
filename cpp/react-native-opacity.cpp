@@ -9,9 +9,28 @@ NativeOpacityTurboModule::NativeOpacityTurboModule(
     std::shared_ptr<CallInvoker> jsinvoker)
     : NativeOpacityCxxSpec(std::move(jsinvoker)) {}
 
-void NativeOpacityTurboModule::init(jsi::Runtime &rt, std::string api_key,
+jsi::Value NativeOpacityTurboModule::init(jsi::Runtime &rt, std::string api_key,
                                     bool dry_run) {
-  opacity_core::init(api_key.c_str(), dry_run);
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
+  return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt, api_key, dry_run]() {
+      int status = opacity_core::init(api_key.c_str(), dry_run);
+      if (status == opacity_core::OPACITY_OK) {
+        jsInvoker->invokeAsync([&rt, resolve] {
+          resolve->asObject(rt).asFunction(rt).call(rt, {});
+        });
+      } else {
+        auto errorCtr = rt.global().getPropertyAsFunction(rt, "Error");
+        auto error = errorCtr.callAsConstructor(
+            rt, jsi::String::createFromUtf8(rt, "Failed to initialize the SDK"));
+        reject->asObject(rt).asFunction(rt).call(rt, error);
+      }
+    }).detach();
+    return {};
+  }));
 }
 
 jsi::Value NativeOpacityTurboModule::getUberRiderProfile(jsi::Runtime &rt) {

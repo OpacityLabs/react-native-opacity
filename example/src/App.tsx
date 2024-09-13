@@ -1,10 +1,12 @@
 import { useEffect } from 'react';
 import { StyleSheet, View, Text, Button } from 'react-native';
-import { getUberRiderPorfile, init } from 'react-native-opacity';
+import { getUberRiderPorfile, init } from '@opacity-labs/react-native-opacity';
 
 export default function App() {
   useEffect(() => {
-    init(process.env.OPACITY_API_KEY!, false);
+    init(process.env.OPACITY_API_KEY!, false).catch((error) => {
+      console.error(`FAILED TO INITIALIZE SDK: ${error}`);
+    });
   }, []);
 
   const getUberRiderProfile = async () => {

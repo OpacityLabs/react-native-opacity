@@ -6,6 +6,6 @@ jsi::Function::createFromHostFunction( \
 rt, \
 jsi::PropNameID::forAscii(rt, name), \
 0, \
-[=](jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) -> jsi::Value
+[=, this](jsi::Runtime &rt, const jsi::Value &thisValue, const jsi::Value *args, size_t count) -> jsi::Value
 
 #endif /* macros_h */

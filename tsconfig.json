@@ -2,7 +2,7 @@
   "compilerOptions": {
     "rootDir": ".",
     "paths": {
-      "react-native-opacity": ["./src/index"]
+      "@opacity-labs/react-native-opacity": ["./src/index"]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,

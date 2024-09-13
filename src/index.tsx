@@ -5,7 +5,7 @@ type WorkflowResponse = {
   proof: string;
 };
 
-export function init(apiKey: string, dryRun: boolean): void {
+export function init(apiKey: string, dryRun: boolean): Promise<void> {
   return Opacity.init(apiKey, dryRun);
 }
 
