@@ -114,6 +114,8 @@ android {
 repositories {
   mavenCentral()
   google()
+  maven { url "https://maven.mozilla.org/maven2/" }
+  maven { url 'https://jitpack.io' }
 }
 
 def kotlin_version = getExtOrDefault("kotlinVersion")
@@ -124,6 +126,7 @@ dependencies {
   //noinspection GradleDynamicVersion
   implementation "com.facebook.react:react-native:+"
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+  implementation 'com.github.OpacityLabs:opacity-android:3.7.0'
 }
 
 if (isNewArchitectureEnabled()) {
