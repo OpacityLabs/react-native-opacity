@@ -22,5 +22,8 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
       </activity>
+      <activity
+        android:name="com.opacitylabs.opacitycore.InAppBrowserActivity"
+        android:theme="@style/Theme.AppCompat.DayNight" />
     </application>
 </manifest>

@@ -4,6 +4,10 @@ import { getUberRiderPorfile, init } from '@opacity-labs/react-native-opacity';
 
 export default function App() {
   useEffect(() => {
+    console.log(
+      'Initializing Opacity SDK with key: ',
+      process.env.OPACITY_API_KEY
+    );
     init(process.env.OPACITY_API_KEY!, false).catch((error) => {
       console.error(`FAILED TO INITIALIZE SDK: ${error}`);
     });

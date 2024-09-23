@@ -89,11 +89,6 @@
       "<rootDir>/lib/"
     ]
   },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
-  },
   "release-it": {
     "git": {
       "commitMessage": "chore: release ${version}",
@@ -176,12 +171,7 @@
       "android": "android/generated"
     },
     "android": {
-      "javaPackageName": "com.opacity"
+      "javaPackageName": "com.opacitylabs.opacitycore"
     }
-  },
-  "create-react-native-library": {
-    "type": "module-new",
-    "languages": "cpp",
-    "version": "0.41.1"
   }
 }

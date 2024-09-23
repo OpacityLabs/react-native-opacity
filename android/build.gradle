@@ -49,13 +49,18 @@ def supportsNamespace() {
 
 android {
   if (supportsNamespace()) {
-    namespace "com.opacity"
+    namespace "com.opacitylabs.opacitycore"
 
     sourceSets {
       main {
         manifest.srcFile "src/main/AndroidManifestNew.xml"
       }
     }
+  }
+
+  buildFeatures {
+    prefab true
+    prefabPublishing true
   }
 
   ndkVersion getExtOrDefault("ndkVersion")
@@ -68,6 +73,7 @@ android {
 
     externalNativeBuild {
       cmake {
+        arguments '-DANDROID_STL=c++_shared'
         cppFlags "-O2 -frtti -fexceptions -Wall -fstack-protector-all"
         abiFilters (*reactNativeArchitectures())
       }
@@ -115,7 +121,6 @@ repositories {
   mavenCentral()
   google()
   maven { url "https://maven.mozilla.org/maven2/" }
-  maven { url 'https://jitpack.io' }
 }
 
 def kotlin_version = getExtOrDefault("kotlinVersion")
@@ -126,13 +131,16 @@ dependencies {
   //noinspection GradleDynamicVersion
   implementation "com.facebook.react:react-native:+"
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  implementation 'com.github.OpacityLabs:opacity-android:3.7.0'
+  implementation "androidx.security:security-crypto:1.1.0-alpha06"
+  implementation "org.mozilla.geckoview:geckoview-nightly:132.0.20240918041351"
+  implementation "androidx.localbroadcastmanager:localbroadcastmanager:1.1.0"
+//  implementation 'com.facebook.fbjni:fbjni:0.6.0'
 }
 
 if (isNewArchitectureEnabled()) {
   react {
     jsRootDir = file("../src/")
     libraryName = "Opacity"
-    codegenJavaPackageName = "com.opacity"
+    codegenJavaPackageName = "com.opacitylabs.opacitycore"
   }
 }
