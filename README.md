@@ -69,6 +69,18 @@ class MainActivity : ReactActivity() {
 
 ## JS
 
+You need to make sure `react-native.config.js` is properly set up for code generation to work:
+
+```js
+module.exports = {
+  project: {
+    android: {
+      packageName: 'your.package.name', // must match your android apps package name, take a look into build.gradle
+    },
+  },
+};
+```
+
 Once everything is setup you can call the init method on your JS:
 
 ```ts
