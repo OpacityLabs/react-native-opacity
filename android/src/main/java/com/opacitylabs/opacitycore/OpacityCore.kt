@@ -66,5 +66,5 @@ object OpacityCore {
     }
 
     private external fun init(): Int
-
+    external fun emitWebviewEvent(json: String)
 }

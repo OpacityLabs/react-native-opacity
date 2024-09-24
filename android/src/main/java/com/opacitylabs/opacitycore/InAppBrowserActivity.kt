@@ -128,7 +128,6 @@ class InAppBrowserActivity : AppCompatActivity() {
     }
 
     private fun handleNavigation(url: String) {
-
         val json =
             "{\"event\": \"navigation\"," +
                     "\"url\": \"$url\", \"cookies\": ${browserCookies}, \"id\": \"${
