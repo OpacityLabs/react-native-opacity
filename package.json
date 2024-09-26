@@ -6,6 +6,7 @@
   "main": "./lib/commonjs/index.js",
   "module": "./lib/module/index.js",
   "exports": {
+    "./react-native.config.js": "./react-native.config.js",
     "./package.json": "./package.json",
     ".": {
       "import": {
