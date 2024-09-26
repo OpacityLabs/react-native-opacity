@@ -5,8 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.mozilla.geckoview.GeckoRuntime
 
 object OpacityCore {
@@ -17,11 +15,10 @@ object OpacityCore {
     private var headers: Bundle = Bundle()
     private lateinit var sRuntime: GeckoRuntime
 
-    fun initialize(context: Context): Int {
+    fun initialize(context: Context) {
         appContext = context
         sRuntime = GeckoRuntime.create(context.applicationContext)
         cryptoManager = CryptoManager(appContext.applicationContext)
-        return init()
     }
 
     fun getRuntime(): GeckoRuntime {
@@ -65,6 +62,5 @@ object OpacityCore {
         Log.d("OpacityCore", "Intent dispatched")
     }
 
-    private external fun init(): Int
     external fun emitWebviewEvent(json: String)
 }
