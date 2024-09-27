@@ -7,13 +7,6 @@
 JavaVM *java_vm;
 jobject java_object;
 
-struct OpacityResponse {
-  int status;
-  const char *json;
-  const char *proof;
-  const char *err;
-};
-
 void DeferThreadDetach(JNIEnv *env) {
   static pthread_key_t thread_key;
 
