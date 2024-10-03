@@ -5,15 +5,6 @@ type WorkflowResponse = {
   proof: string;
 };
 
-export type WorkflowArgs = {
-  limit?: number;
-  offset?: number;
-  id?: string;
-  startDate?: string;
-  endDate?: string;
-  cursor?: string;
-};
-
 export function init(apiKey: string, dryRun: boolean): Promise<void> {
   return Opacity.init(apiKey, dryRun);
 }
@@ -70,9 +61,10 @@ export function getZabkaPoints(): Promise<WorkflowResponse> {
 }
 
 // @TODO: impr func and types
+
 export function callResource(
   alias: string,
-  args?: WorkflowArgs
+  args?: any
 ): Promise<WorkflowResponse> {
   switch (alias.toLowerCase()) {
     case 'uber:rider:read:profile':

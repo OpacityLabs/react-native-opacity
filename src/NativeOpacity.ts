@@ -1,6 +1,5 @@
 import type { TurboModule } from 'react-native';
 import { TurboModuleRegistry } from 'react-native';
-import type { WorkflowArgs } from './index';
 
 export interface Spec extends TurboModule {
   init(apiKey: string, dryRun: boolean): Promise<void>;
@@ -22,10 +21,7 @@ export interface Spec extends TurboModule {
   getRedditPosts(): Promise<{ data: string; proof: string }>;
   getZabkaAccount(): Promise<{ data: string; proof: string }>;
   getZabkaPoints(): Promise<{ data: string; proof: string }>;
-  callResource(
-    alias: string,
-    args?: WorkflowArgs
-  ): Promise<{ data: string; proof: string }>;
+  callResource(alias: string): Promise<{ data: string; proof: string }>;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('Opacity');
