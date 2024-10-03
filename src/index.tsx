@@ -5,6 +5,15 @@ type WorkflowResponse = {
   proof: string;
 };
 
+export type WorkflowArgs = {
+  limit?: number;
+  offset?: number;
+  id?: string;
+  startDate?: string;
+  endDate?: string;
+  cursor?: string;
+};
+
 export function init(apiKey: string, dryRun: boolean): Promise<void> {
   return Opacity.init(apiKey, dryRun);
 }
@@ -58,4 +67,44 @@ export function getZabkaAccount(): Promise<WorkflowResponse> {
 
 export function getZabkaPoints(): Promise<WorkflowResponse> {
   return Opacity.getZabkaPoints();
+}
+
+// @TODO: impr func and types
+export function callResource(
+  alias: string,
+  args?: WorkflowArgs
+): Promise<WorkflowResponse> {
+  switch (alias.toLowerCase()) {
+    case 'uber:rider:read:profile':
+      return Opacity.getUberRiderProfile();
+    case 'uber:rider:read:trip_history':
+      return Opacity.getUberRiderTripHistory(
+        args?.limit ?? 10,
+        args?.offset ?? 0
+      );
+    case 'uber:rider:read:trip':
+      return Opacity.getUberRiderTrip(args?.id ?? '');
+    case 'uber:driver:read:profile':
+      return Opacity.getUberDriverProfile();
+    case 'uber:driver:read:trips':
+      return Opacity.getUberDriverTrips(
+        args?.startDate ?? '',
+        args?.endDate ?? '',
+        args?.cursor ?? ''
+      );
+    case 'reddit:read:account':
+      return Opacity.getRedditAccount();
+    case 'reddit:read:subreddits':
+      return Opacity.getRedditFollowedSubreddits();
+    case 'reddit:read:comments':
+      return Opacity.getRedditCommets();
+    case 'reddit:read:posts':
+      return Opacity.getRedditPosts();
+    case 'zabka:read:account':
+      return Opacity.getZabkaAccount();
+    case 'zabka:read:points':
+      return Opacity.getZabkaPoints();
+    default:
+      throw Error('Resource not found');
+  }
 }
