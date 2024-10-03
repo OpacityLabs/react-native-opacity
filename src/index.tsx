@@ -62,28 +62,18 @@ export function getZabkaPoints(): Promise<WorkflowResponse> {
 
 // @TODO: impr func and types
 
-export function callResource(
-  alias: string,
-  args?: any
-): Promise<WorkflowResponse> {
+export function callResource(alias: string): Promise<WorkflowResponse> {
   switch (alias.toLowerCase()) {
     case 'uber:rider:read:profile':
       return Opacity.getUberRiderProfile();
     case 'uber:rider:read:trip_history':
-      return Opacity.getUberRiderTripHistory(
-        args?.limit ?? 10,
-        args?.offset ?? 0
-      );
+      return Opacity.getUberRiderTripHistory(10, 0);
     case 'uber:rider:read:trip':
-      return Opacity.getUberRiderTrip(args?.id ?? '');
+      return Opacity.getUberRiderTrip('');
     case 'uber:driver:read:profile':
       return Opacity.getUberDriverProfile();
     case 'uber:driver:read:trips':
-      return Opacity.getUberDriverTrips(
-        args?.startDate ?? '',
-        args?.endDate ?? '',
-        args?.cursor ?? ''
-      );
+      return Opacity.getUberDriverTrips('', '', '');
     case 'reddit:read:account':
       return Opacity.getRedditAccount();
     case 'reddit:read:subreddits':
