@@ -21,7 +21,6 @@ export interface Spec extends TurboModule {
   getRedditPosts(): Promise<{ data: string; proof: string }>;
   getZabkaAccount(): Promise<{ data: string; proof: string }>;
   getZabkaPoints(): Promise<{ data: string; proof: string }>;
-  callResource(alias: string): Promise<{ data: string; proof: string }>;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('Opacity');
