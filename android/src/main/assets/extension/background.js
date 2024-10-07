@@ -1,7 +1,8 @@
+/* eslint-disable no-undef */
 browser.webRequest.onHeadersReceived.addListener(
   function (details) {
     let cookiesHeaders = details.responseHeaders.filter(
-      (header) => header.name.toLowerCase() === "set-cookie"
+      (header) => header.name.toLowerCase() === 'set-cookie'
     );
 
     if (cookiesHeaders.length === 0) {
@@ -19,19 +20,20 @@ browser.webRequest.onHeadersReceived.addListener(
 
     // Parse cookies
     let cookieDict = {};
-    cookies.split("\n").forEach((cookie) => {
-      let cookieParts = cookie.split(";")[0].split("=");
+    cookies.split('\n').forEach((cookie) => {
+      let cookieParts = cookie.split(';')[0].split('=');
       let cookieName = cookieParts[0].trim();
       let cookieValue = cookieParts[1].trim();
       cookieDict[cookieName] = cookieValue;
     });
 
     // Send cookies back to the app (GeckoView) via messaging
-    browser.runtime.sendNativeMessage("gecko", {
-      event: "cookies",
+    /* eslint-disable no-undef */
+    browser.runtime.sendNativeMessage('gecko', {
+      event: 'cookies',
       cookies: cookieDict,
     });
   },
-  { urls: ["<all_urls>"] }, // Intercept all URLs
-  ["responseHeaders"]
+  { urls: ['<all_urls>'] }, // Intercept all URLs
+  ['responseHeaders']
 );
