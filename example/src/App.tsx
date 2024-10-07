@@ -25,10 +25,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text>Opacity RN app</Text>
-      <Button
-        title="Get uber rider profile"
-        onPress={getUberRiderProfile}
-      ></Button>
+      <Button title="Get uber rider profile" onPress={getUberRiderProfile} />
     </View>
   );
 }

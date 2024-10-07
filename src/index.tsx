@@ -59,3 +59,74 @@ export function getZabkaAccount(): Promise<WorkflowResponse> {
 export function getZabkaPoints(): Promise<WorkflowResponse> {
   return Opacity.getZabkaPoints();
 }
+
+export function getResource(
+  alias: 'uber:rider:read:trip_history',
+  limit: number,
+  offset: number
+): Promise<WorkflowResponse>;
+export function getResource(
+  alias: 'uber:rider:read:profile'
+): Promise<WorkflowResponse>;
+export function getResource(
+  alias: 'uber:rider:read:trip',
+  id: string
+): Promise<WorkflowResponse>;
+export function getResource(
+  alias: 'uber:driver:read:profile'
+): Promise<WorkflowResponse>;
+export function getResource(
+  alias: 'uber:rider:read:trips',
+  startDate: string,
+  endDate: string,
+  cursor: string
+): Promise<WorkflowResponse>;
+export function getResource(
+  alias: 'reddit:read:account'
+): Promise<WorkflowResponse>;
+export function getResource(
+  alias: 'reddit:read:subreddits'
+): Promise<WorkflowResponse>;
+export function getResource(
+  alias: 'reddit:read:comments'
+): Promise<WorkflowResponse>;
+export function getResource(
+  alias: 'reddit:read:posts'
+): Promise<WorkflowResponse>;
+export function getResource(
+  alias: 'zabka:read:account'
+): Promise<WorkflowResponse>;
+export function getResource(
+  alias: 'zabka:read:points'
+): Promise<WorkflowResponse>;
+export function getResource(
+  alias: string,
+  ...args: any[]
+): Promise<WorkflowResponse> {
+  switch (alias.toLowerCase()) {
+    case 'uber:rider:read:profile':
+      return Opacity.getUberRiderProfile();
+    case 'uber:rider:read:trip_history':
+      return Opacity.getUberRiderTripHistory(args[0], args[1]);
+    case 'uber:rider:read:trip':
+      return Opacity.getUberRiderTrip(args[0]);
+    case 'uber:driver:read:profile':
+      return Opacity.getUberDriverProfile();
+    case 'uber:driver:read:trips':
+      return Opacity.getUberDriverTrips(args[0], args[1], args[2]);
+    case 'reddit:read:account':
+      return Opacity.getRedditAccount();
+    case 'reddit:read:subreddits':
+      return Opacity.getRedditFollowedSubreddits();
+    case 'reddit:read:comments':
+      return Opacity.getRedditCommets();
+    case 'reddit:read:posts':
+      return Opacity.getRedditPosts();
+    case 'zabka:read:account':
+      return Opacity.getZabkaAccount();
+    case 'zabka:read:points':
+      return Opacity.getZabkaPoints();
+    default:
+      throw Error('Resource not found');
+  }
+}
