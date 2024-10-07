@@ -5,6 +5,19 @@ type WorkflowResponse = {
   proof: string;
 };
 
+export type Alias =
+  | 'uber:rider:read:profile'
+  | 'uber:rider:read:trip_history'
+  | 'uber:rider:read:trip'
+  | 'uber:driver:read:profile'
+  | 'uber:driver:read:trips'
+  | 'reddit:read:account'
+  | 'reddit:read:subreddits'
+  | 'reddit:read:comments'
+  | 'reddit:read:posts'
+  | 'zabka:read:account'
+  | 'zabka:read:points';
+
 export function init(apiKey: string, dryRun: boolean): Promise<void> {
   return Opacity.init(apiKey, dryRun);
 }
