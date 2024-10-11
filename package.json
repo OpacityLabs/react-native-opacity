@@ -1,6 +1,6 @@
 {
   "name": "@opacity-labs/react-native-opacity",
-  "version": "3.11.35",
+  "version": "3.11.36",
   "description": "Opacity Networks library for React Native",
   "source": "./src/index.tsx",
   "main": "./lib/commonjs/index.js",
