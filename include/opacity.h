@@ -56,6 +56,14 @@ int32_t get_uber_driver_trips(const char *start_date,
                               char **proof_ptr,
                               char **err_ptr);
 
+int32_t get_uber_fare_estimate(double pickup_latitude,
+                               double pickup_longitude,
+                               double destination_latitude,
+                               double destination_longitude,
+                               char **json_ptr,
+                               char **proof_ptr,
+                               char **err_ptr);
+
 int32_t get_reddit_account(char **json_ptr, char **proof_ptr, char **err_ptr);
 
 int32_t get_reddit_followed_subreddits(char **json_ptr, char **proof_ptr, char **err_ptr);
