@@ -15,6 +15,12 @@ export interface Spec extends TurboModule {
     endDate: string,
     cursor: string
   ): Promise<{ data: string; proof: string }>;
+  getUberFareEstimate(
+    pickupLatitude: number,
+    pickupLongitude: number,
+    dropoffLatitude: number,
+    dropoffLongitude: number
+  ): Promise<{ data: string; proof: string }>;
   getRedditAccount(): Promise<{ data: string; proof: string }>;
   getRedditFollowedSubreddits(): Promise<{ data: string; proof: string }>;
   getRedditCommets(): Promise<{ data: string; proof: string }>;

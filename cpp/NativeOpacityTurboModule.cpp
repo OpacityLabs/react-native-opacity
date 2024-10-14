@@ -232,6 +232,47 @@ jsi::Value NativeOpacityTurboModule::getUberDriverTrips(jsi::Runtime &rt,
   }));
 }
 
+jsi::Value NativeOpacityTurboModule::getUberFareEstimate(
+    jsi::Runtime &rt, double pickupLatitude, double pickupLongitude,
+    double dropoffLatitude, double dropoffLongitude) {
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
+    return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt, pickupLatitude,
+                 pickupLongitude, dropoffLatitude, dropoffLongitude]() {
+      char *json;
+      char *proof;
+      char *err;
+
+      int status = opacity_core::get_uber_fare_estimate(
+          pickupLatitude, pickupLongitude, dropoffLatitude, dropoffLongitude,
+          &json, &proof, &err);
+
+      if (status == opacity_core::OPACITY_OK) {
+        jsInvoker->invokeAsync([&rt, resolve, json] {
+          auto data = jsi::String::createFromUtf8(rt, json);
+          auto proof = jsi::String::createFromUtf8(rt, "");
+          auto res = jsi::Object(rt);
+          res.setProperty(rt, "data", data);
+          res.setProperty(rt, "proof", proof);
+          resolve->asObject(rt).asFunction(rt).call(rt, res);
+        });
+      } else {
+        jsInvoker->invokeAsync([&rt, reject, err] {
+          auto errorCtr = rt.global().getPropertyAsFunction(rt, "Error");
+          auto error = errorCtr.callAsConstructor(
+              rt, jsi::String::createFromUtf8(rt, err));
+          reject->asObject(rt).asFunction(rt).call(rt, error);
+        });
+      };
+      return;
+    }).detach();
+    return {};
+                                                                      }));
+}
+
 jsi::Value NativeOpacityTurboModule::getRedditAccount(jsi::Runtime &rt) {
   jsi::Function promiseConstructor =
       rt.global().getPropertyAsFunction(rt, "Promise");

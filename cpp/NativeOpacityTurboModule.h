@@ -19,6 +19,7 @@ public:
   jsi::Value getUberRiderTrip(jsi::Runtime &rt, jsi::String id);
   jsi::Value getUberDriverProfile(jsi::Runtime &rt);
   jsi::Value getUberDriverTrips(jsi::Runtime &rt, jsi::String startDate, jsi::String endDate, jsi::String cursor);
+  jsi::Value getUberFareEstimate(jsi::Runtime &rt, double pickupLatitude, double pickupLongitude, double dropoffLatitude, double dropoffLongitude);
   jsi::Value getRedditAccount(jsi::Runtime &rt);
   jsi::Value getRedditFollowedSubreddits(jsi::Runtime &rt);
   jsi::Value getRedditCommets(jsi::Runtime &rt);
