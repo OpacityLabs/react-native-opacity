@@ -82,6 +82,13 @@ export function getResource(
   cursor: string
 ): Promise<WorkflowResponse>;
 export function getResource(
+  alias: 'uber:fare:estimate',
+  pickupLatitute: number,
+  pickupLongitude: number,
+  dropoffLatitute: number,
+  dropoffLongitude: number
+): Promise<WorkflowResponse>;
+export function getResource(
   alias: 'reddit:read:account'
 ): Promise<WorkflowResponse>;
 export function getResource(
@@ -126,6 +133,8 @@ export function getResource(
       return Opacity.getZabkaAccount();
     case 'zabka:read:points':
       return Opacity.getZabkaPoints();
+    case 'uber:fare:estimate':
+      return Opacity.getUberFareEstimate(args[0], args[1], args[2], args[3]);
     default:
       throw Error('Resource not found');
   }
