@@ -36,8 +36,7 @@ const char *start(const char *request);
 
 int32_t get_uber_rider_profile(char **json_ptr, char **proof_ptr, char **err_ptr);
 
-int32_t get_uber_rider_trip_history(int32_t limit,
-                                    int32_t offset,
+int32_t get_uber_rider_trip_history(const char *cursor,
                                     char **json_ptr,
                                     char **proof_ptr,
                                     char **err_ptr);
