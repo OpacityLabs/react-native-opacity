@@ -15,7 +15,7 @@ public:
   NativeOpacityTurboModule(std::shared_ptr<CallInvoker> jsInvoker);
   jsi::Value init(jsi::Runtime &rt, std::string api_key, bool dry_run);
   jsi::Value getUberRiderProfile(jsi::Runtime &rt);
-  jsi::Value getUberRiderTripHistory(jsi::Runtime &rt, double limit, double offset);
+  jsi::Value getUberRiderTripHistory(jsi::Runtime &rt, jsi::String cursor);
   jsi::Value getUberRiderTrip(jsi::Runtime &rt, jsi::String id);
   jsi::Value getUberDriverProfile(jsi::Runtime &rt);
   jsi::Value getUberDriverTrips(jsi::Runtime &rt, jsi::String startDate, jsi::String endDate, jsi::String cursor);

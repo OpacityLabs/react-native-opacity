@@ -5,8 +5,7 @@ export interface Spec extends TurboModule {
   init(apiKey: string, dryRun: boolean): Promise<void>;
   getUberRiderProfile(): Promise<{ data: string; proof: string }>;
   getUberRiderTripHistory(
-    limit: number,
-    offset: number
+    cursor: string
   ): Promise<{ data: string; proof: string }>;
   getUberRiderTrip(id: string): Promise<{ data: string; proof: string }>;
   getUberDriverProfile(): Promise<{ data: string; proof: string }>;

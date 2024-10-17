@@ -72,22 +72,20 @@ jsi::Value NativeOpacityTurboModule::getUberRiderProfile(jsi::Runtime &rt) {
 }
 
 jsi::Value NativeOpacityTurboModule::getUberRiderTripHistory(jsi::Runtime &rt,
-                                                             double limit,
-                                                             double offset) {
+                                                             jsi::String cursor) {
   jsi::Function promiseConstructor =
       rt.global().getPropertyAsFunction(rt, "Promise");
+  auto cursor_str = cursor.utf8(rt);
 
   return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
     auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
     auto reject = std::make_shared<jsi::Value>(rt, args[1]);
-    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt, &limit,
-                 &offset]() {
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt, &cursor_str]() {
       char *json;
       char *proof;
       char *err;
 
-      int status = opacity_core::get_uber_rider_trip_history(
-          limit, offset, &json, &proof, &err);
+      int status = opacity_core::get_uber_rider_trip_history(cursor_str.c_str(), &json, &proof, &err);
 
       if (status == opacity_core::OPACITY_OK) {
         jsInvoker->invokeAsync([&rt, resolve, json] {

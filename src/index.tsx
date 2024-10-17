@@ -14,10 +14,9 @@ export function getUberRiderPorfile(): Promise<WorkflowResponse> {
 }
 
 export function getUberRiderTripHistory(
-  limit: number,
-  offset: number
+  cursor: string
 ): Promise<WorkflowResponse> {
-  return Opacity.getUberRiderTripHistory(limit, offset);
+  return Opacity.getUberRiderTripHistory(cursor);
 }
 
 export function getUberRiderTrip(id: string): Promise<WorkflowResponse> {
@@ -62,8 +61,7 @@ export function getZabkaPoints(): Promise<WorkflowResponse> {
 
 export function getResource(
   alias: 'uber:rider:read:trip_history',
-  limit: number,
-  offset: number
+  cursor: string
 ): Promise<WorkflowResponse>;
 export function getResource(
   alias: 'uber:rider:read:profile'
@@ -114,7 +112,7 @@ export function getResource(
     case 'uber:rider:read:profile':
       return Opacity.getUberRiderProfile();
     case 'uber:rider:read:trip_history':
-      return Opacity.getUberRiderTripHistory(args[0], args[1]);
+      return Opacity.getUberRiderTripHistory(args[0]);
     case 'uber:rider:read:trip':
       return Opacity.getUberRiderTrip(args[0]);
     case 'uber:driver:read:profile':
