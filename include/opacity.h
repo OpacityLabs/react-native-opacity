@@ -76,6 +76,8 @@ int32_t get_zabka_account(char **json_ptr, char **proof_ptr, char **err_ptr);
 
 int32_t get_zabka_points(char **json_ptr, char **proof_ptr, char **err_ptr);
 
+int32_t test_server_error(char **json_ptr, char **proof_ptr, char **err_ptr);
+
 extern double get_battery_level(void);
 
 extern const char *get_battery_status(void);
