@@ -21,11 +21,27 @@ export interface Spec extends TurboModule {
     dropoffLongitude: number
   ): Promise<{ data: string; proof: string }>;
   getRedditAccount(): Promise<{ data: string; proof: string }>;
+  // reddit
   getRedditFollowedSubreddits(): Promise<{ data: string; proof: string }>;
-  getRedditCommets(): Promise<{ data: string; proof: string }>;
+  getRedditComments(): Promise<{ data: string; proof: string }>;
   getRedditPosts(): Promise<{ data: string; proof: string }>;
+  // zabka
   getZabkaAccount(): Promise<{ data: string; proof: string }>;
   getZabkaPoints(): Promise<{ data: string; proof: string }>;
+  // carta
+  getCartaProfile(): Promise<{ data: string; proof: string }>;
+  getCartaOrganizations(): Promise<{ data: string; proof: string }>;
+  getCartaPortfolioInvestments(
+    firmId: string,
+    accountId: string
+  ): Promise<{ data: string; proof: string }>;
+  getCartaHoldingsCompanies(
+    accountId: string
+  ): Promise<{ data: string; proof: string }>;
+  getCartaCorporationSecurities(
+    accountId: string,
+    corporationId: string
+  ): Promise<{ data: string; proof: string }>;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('Opacity');

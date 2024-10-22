@@ -71,8 +71,9 @@ jsi::Value NativeOpacityTurboModule::getUberRiderProfile(jsi::Runtime &rt) {
   }));
 }
 
-jsi::Value NativeOpacityTurboModule::getUberRiderTripHistory(jsi::Runtime &rt,
-                                                             jsi::String cursor) {
+jsi::Value
+NativeOpacityTurboModule::getUberRiderTripHistory(jsi::Runtime &rt,
+                                                  jsi::String cursor) {
   jsi::Function promiseConstructor =
       rt.global().getPropertyAsFunction(rt, "Promise");
   auto cursor_str = cursor.utf8(rt);
@@ -85,7 +86,8 @@ jsi::Value NativeOpacityTurboModule::getUberRiderTripHistory(jsi::Runtime &rt,
       char *proof;
       char *err;
 
-      int status = opacity_core::get_uber_rider_trip_history(cursor_str.c_str(), &json, &proof, &err);
+      int status = opacity_core::get_uber_rider_trip_history(
+          cursor_str.c_str(), &json, &proof, &err);
 
       if (status == opacity_core::OPACITY_OK) {
         jsInvoker->invokeAsync([&rt, resolve, json] {
@@ -345,7 +347,7 @@ NativeOpacityTurboModule::getRedditFollowedSubreddits(jsi::Runtime &rt) {
   }));
 };
 
-jsi::Value NativeOpacityTurboModule::getRedditCommets(jsi::Runtime &rt) {
+jsi::Value NativeOpacityTurboModule::getRedditComments(jsi::Runtime &rt) {
   jsi::Function promiseConstructor =
       rt.global().getPropertyAsFunction(rt, "Promise");
   return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
@@ -452,6 +454,7 @@ jsi::Value NativeOpacityTurboModule::getZabkaAccount(jsi::Runtime &rt) {
     return {};
   }));
 };
+
 jsi::Value NativeOpacityTurboModule::getZabkaPoints(jsi::Runtime &rt) {
   jsi::Function promiseConstructor =
       rt.global().getPropertyAsFunction(rt, "Promise");
@@ -486,6 +489,195 @@ jsi::Value NativeOpacityTurboModule::getZabkaPoints(jsi::Runtime &rt) {
     }).detach();
     return {};
   }));
-};
+}
 
+jsi::Value NativeOpacityTurboModule::getCartaProfile(jsi::Runtime &rt) {
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
+        return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt]() {
+      char *json;
+      char *proof;
+      char *err;
+
+      int status = opacity_core::get_carta_profile(&json, &proof, &err);
+
+      if (status == opacity_core::OPACITY_OK) {
+        jsInvoker->invokeAsync([&rt, resolve, json] {
+          auto data = jsi::String::createFromUtf8(rt, json);
+          auto proof = jsi::String::createFromUtf8(rt, "");
+          auto res = jsi::Object(rt);
+          res.setProperty(rt, "data", data);
+          res.setProperty(rt, "proof", proof);
+          resolve->asObject(rt).asFunction(rt).call(rt, res);
+        });
+      } else {
+        jsInvoker->invokeAsync([&rt, reject, err] {
+          auto errorCtr = rt.global().getPropertyAsFunction(rt, "Error");
+          auto error = errorCtr.callAsConstructor(
+              rt, jsi::String::createFromUtf8(rt, err));
+          reject->asObject(rt).asFunction(rt).call(rt, error);
+        });
+      };
+    }).detach();
+    return {};
+  }));
+}
+
+jsi::Value NativeOpacityTurboModule::getCartaOrganizations(jsi::Runtime &rt) {
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
+    return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt]() {
+      char *json;
+      char *proof;
+      char *err;
+
+      int status = opacity_core::get_carta_organizations(&json, &proof, &err);
+
+      if (status == opacity_core::OPACITY_OK) {
+        jsInvoker->invokeAsync([&rt, resolve, json] {
+          auto data = jsi::String::createFromUtf8(rt, json);
+          auto proof = jsi::String::createFromUtf8(rt, "");
+          auto res = jsi::Object(rt);
+          res.setProperty(rt, "data", data);
+          res.setProperty(rt, "proof", proof);
+          resolve->asObject(rt).asFunction(rt).call(rt, res);
+        });
+      } else {
+        jsInvoker->invokeAsync([&rt, reject, err] {
+          auto errorCtr = rt.global().getPropertyAsFunction(rt, "Error");
+          auto error = errorCtr.callAsConstructor(
+              rt, jsi::String::createFromUtf8(rt, err));
+          reject->asObject(rt).asFunction(rt).call(rt, error);
+        });
+      };
+    }).detach();
+    return {};
+  }));
+}
+jsi::Value NativeOpacityTurboModule::getCartaPortfolioInvestments(
+    jsi::Runtime &rt, jsi::String firm_id, jsi::String account_id) {
+  auto firm_id_str = firm_id.utf8(rt);
+  auto account_id_str = account_id.utf8(rt);
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
+    return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt, firm_id_str,
+                 account_id_str]() {
+      char *json;
+      char *proof;
+      char *err;
+
+      int status = opacity_core::get_carta_portfolio_investments(
+          firm_id_str.c_str(), account_id_str.c_str(), &json, &proof, &err);
+
+      if (status == opacity_core::OPACITY_OK) {
+        jsInvoker->invokeAsync([&rt, resolve, json] {
+          auto data = jsi::String::createFromUtf8(rt, json);
+          auto proof = jsi::String::createFromUtf8(rt, "");
+          auto res = jsi::Object(rt);
+          res.setProperty(rt, "data", data);
+          res.setProperty(rt, "proof", proof);
+          resolve->asObject(rt).asFunction(rt).call(rt, res);
+        });
+      } else {
+        jsInvoker->invokeAsync([&rt, reject, err] {
+          auto errorCtr = rt.global().getPropertyAsFunction(rt, "Error");
+          auto error = errorCtr.callAsConstructor(
+              rt, jsi::String::createFromUtf8(rt, err));
+          reject->asObject(rt).asFunction(rt).call(rt, error);
+        });
+      };
+    }).detach();
+    return {};
+                                                                      }));
+}
+jsi::Value
+NativeOpacityTurboModule::getCartaHoldingsCompanies(jsi::Runtime &rt,
+                                                    jsi::String account_id) {
+  auto account_id_str = account_id.utf8(rt);
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
+    return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt,
+                 account_id_str]() {
+      char *json;
+      char *proof;
+      char *err;
+
+      int status = opacity_core::get_carta_holdings_companies(
+          account_id_str.c_str(), &json, &proof, &err);
+
+      if (status == opacity_core::OPACITY_OK) {
+        jsInvoker->invokeAsync([&rt, resolve, json] {
+          auto data = jsi::String::createFromUtf8(rt, json);
+          auto proof = jsi::String::createFromUtf8(rt, "");
+          auto res = jsi::Object(rt);
+          res.setProperty(rt, "data", data);
+          res.setProperty(rt, "proof", proof);
+          resolve->asObject(rt).asFunction(rt).call(rt, res);
+        });
+      } else {
+        jsInvoker->invokeAsync([&rt, reject, err] {
+          auto errorCtr = rt.global().getPropertyAsFunction(rt, "Error");
+          auto error = errorCtr.callAsConstructor(
+              rt, jsi::String::createFromUtf8(rt, err));
+          reject->asObject(rt).asFunction(rt).call(rt, error);
+        });
+      };
+    }).detach();
+    return {};
+  }));
+}
+
+jsi::Value NativeOpacityTurboModule::getCartaCorporationSecurities(
+    jsi::Runtime &rt, jsi::String account_id, jsi::String corporation_id) {
+  auto account_id_str = account_id.utf8(rt);
+  auto corporation_id_str = corporation_id.utf8(rt);
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
+    return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt, account_id_str,
+                 corporation_id_str]() {
+      char *json;
+      char *proof;
+      char *err;
+
+      int status = opacity_core::get_carta_corporation_securities(
+          account_id_str.c_str(), corporation_id_str.c_str(), &json, &proof,
+          &err);
+
+      if (status == opacity_core::OPACITY_OK) {
+        jsInvoker->invokeAsync([&rt, resolve, json] {
+          auto data = jsi::String::createFromUtf8(rt, json);
+          auto proof = jsi::String::createFromUtf8(rt, "");
+          auto res = jsi::Object(rt);
+          res.setProperty(rt, "data", data);
+          res.setProperty(rt, "proof", proof);
+          resolve->asObject(rt).asFunction(rt).call(rt, res);
+        });
+      } else {
+        jsInvoker->invokeAsync([&rt, reject, err] {
+          auto errorCtr = rt.global().getPropertyAsFunction(rt, "Error");
+          auto error = errorCtr.callAsConstructor(
+              rt, jsi::String::createFromUtf8(rt, err));
+          reject->asObject(rt).asFunction(rt).call(rt, error);
+        });
+      };
+    }).detach();
+    return {};
+  }));
+}
 } // namespace facebook::react

@@ -75,7 +75,26 @@ int32_t get_zabka_account(char **json_ptr, char **proof_ptr, char **err_ptr);
 
 int32_t get_zabka_points(char **json_ptr, char **proof_ptr, char **err_ptr);
 
-int32_t test_server_error(char **json_ptr, char **proof_ptr, char **err_ptr);
+int32_t get_carta_profile(char **json_ptr, char **proof_ptr, char **err_ptr);
+
+int32_t get_carta_organizations(char **json_ptr, char **proof_ptr, char **err_ptr);
+
+int32_t get_carta_portfolio_investments(const char *firm_id,
+                                        const char *account_id,
+                                        char **json_ptr,
+                                        char **proof_ptr,
+                                        char **err_ptr);
+
+int32_t get_carta_holdings_companies(const char *account_id,
+                                     char **json_ptr,
+                                     char **proof_ptr,
+                                     char **err_ptr);
+
+int32_t get_carta_corporation_securities(const char *account_id,
+                                         const char *corporation_id,
+                                         char **json_ptr,
+                                         char **proof_ptr,
+                                         char **err_ptr);
 
 extern double get_battery_level(void);
 
