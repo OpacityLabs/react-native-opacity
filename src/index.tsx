@@ -80,7 +80,7 @@ export function getResource(
   cursor: string
 ): Promise<WorkflowResponse>;
 export function getResource(
-  alias: 'uber:fare:estimate',
+  alias: 'uber:rider:read:fare_estimate',
   pickupLatitute: number,
   pickupLongitude: number,
   dropoffLatitute: number,
@@ -131,7 +131,7 @@ export function getResource(
       return Opacity.getZabkaAccount();
     case 'zabka:read:points':
       return Opacity.getZabkaPoints();
-    case 'uber:fare:estimate':
+    case 'uber:rider:read:fare_estimate':
       return Opacity.getUberFareEstimate(args[0], args[1], args[2], args[3]);
     default:
       throw Error('Resource not found');
