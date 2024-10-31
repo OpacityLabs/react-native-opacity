@@ -43,8 +43,8 @@ export function getRedditFollowedSubreddits(): Promise<WorkflowResponse> {
   return Opacity.getRedditFollowedSubreddits();
 }
 
-export function getRedditCommets(): Promise<WorkflowResponse> {
-  return Opacity.getRedditCommets();
+export function getRedditComments(): Promise<WorkflowResponse> {
+  return Opacity.getRedditComments();
 }
 
 export function getRedditPosts(): Promise<WorkflowResponse> {
@@ -124,7 +124,7 @@ export function getResource(
     case 'reddit:read:subreddits':
       return Opacity.getRedditFollowedSubreddits();
     case 'reddit:read:comments':
-      return Opacity.getRedditCommets();
+      return Opacity.getRedditComments();
     case 'reddit:read:posts':
       return Opacity.getRedditPosts();
     case 'zabka:read:account':
