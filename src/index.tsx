@@ -43,8 +43,8 @@ export function getRedditFollowedSubreddits(): Promise<WorkflowResponse> {
   return Opacity.getRedditFollowedSubreddits();
 }
 
-export function getRedditCommets(): Promise<WorkflowResponse> {
-  return Opacity.getRedditCommets();
+export function getRedditComments(): Promise<WorkflowResponse> {
+  return Opacity.getRedditComments();
 }
 
 export function getRedditPosts(): Promise<WorkflowResponse> {
@@ -80,7 +80,7 @@ export function getResource(
   cursor: string
 ): Promise<WorkflowResponse>;
 export function getResource(
-  alias: 'uber:fare:estimate',
+  alias: 'uber:rider:read:fare_estimate',
   pickupLatitute: number,
   pickupLongitude: number,
   dropoffLatitute: number,
@@ -124,14 +124,14 @@ export function getResource(
     case 'reddit:read:subreddits':
       return Opacity.getRedditFollowedSubreddits();
     case 'reddit:read:comments':
-      return Opacity.getRedditCommets();
+      return Opacity.getRedditComments();
     case 'reddit:read:posts':
       return Opacity.getRedditPosts();
     case 'zabka:read:account':
       return Opacity.getZabkaAccount();
     case 'zabka:read:points':
       return Opacity.getZabkaPoints();
-    case 'uber:fare:estimate':
+    case 'uber:rider:read:fare_estimate':
       return Opacity.getUberFareEstimate(args[0], args[1], args[2], args[3]);
     default:
       throw Error('Resource not found');
