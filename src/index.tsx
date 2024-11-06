@@ -9,7 +9,7 @@ export function init(apiKey: string, dryRun: boolean): Promise<void> {
   return Opacity.init(apiKey, dryRun);
 }
 
-export function getUberRiderPorfile(): Promise<WorkflowResponse> {
+export function getUberRiderProfile(): Promise<WorkflowResponse> {
   return Opacity.getUberRiderProfile();
 }
 
