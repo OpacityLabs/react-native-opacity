@@ -1,6 +1,10 @@
 import { useEffect } from 'react';
 import { StyleSheet, View, Text, Button } from 'react-native';
-import { getUberRiderPorfile, init } from '@opacity-labs/react-native-opacity';
+import {
+  getUberRiderProfile,
+  init,
+  OpacityEnvironment,
+} from '@opacity-labs/react-native-opacity';
 
 export default function App() {
   useEffect(() => {
@@ -8,14 +12,16 @@ export default function App() {
       'Initializing Opacity SDK with key: ',
       process.env.OPACITY_API_KEY
     );
-    init(process.env.OPACITY_API_KEY!, false).catch((error) => {
-      console.error(`FAILED TO INITIALIZE SDK: ${error}`);
-    });
+    init(process.env.OPACITY_API_KEY!, false, OpacityEnvironment.Staging).catch(
+      (error) => {
+        console.error(`FAILED TO INITIALIZE SDK: ${error}`);
+      }
+    );
   }, []);
 
-  const getUberRiderProfile = async () => {
+  const getUberRiderProfileCallback = async () => {
     try {
-      const riderProfile = await getUberRiderPorfile();
+      const riderProfile = await getUberRiderProfile();
       console.log(riderProfile);
     } catch (error) {
       console.error(error);
@@ -25,7 +31,10 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text>Opacity RN app</Text>
-      <Button title="Get uber rider profile" onPress={getUberRiderProfile} />
+      <Button
+        title="Get uber rider profile"
+        onPress={getUberRiderProfileCallback}
+      />
     </View>
   );
 }
