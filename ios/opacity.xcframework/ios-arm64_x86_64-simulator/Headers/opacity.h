@@ -24,7 +24,15 @@ extern const int32_t OPACITY_GENERIC_ERROR;
 
 extern const int32_t OPACITY_NOT_SUPPORTED;
 
-int32_t init(const char *api_key_str, bool dry_run);
+extern const int32_t OPACITY_ENVIRONMENT_TEST;
+
+extern const int32_t OPACITY_ENVIRONMENT_LOCAL;
+
+extern const int32_t OPACITY_ENVIRONMENT_STAGING;
+
+extern const int32_t OPACITY_ENVIRONMENT_PRODUCTION;
+
+int32_t init(const char *api_key_str, bool dry_run, int32_t backend_environment);
 
 void execute_workflow(const char *flow);
 

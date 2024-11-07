@@ -23,8 +23,6 @@ RCT_ENABLE_NEW_ARCH=1 pod install --repo-update
 
 ## Android
 
-You need to modify a bunch of stuff for Android.
-
 First add the necessary repos to download the dependencies. On your root `build.gradle` add:
 
 ```
@@ -75,7 +73,7 @@ You need to make sure `react-native.config.js` is properly set up for code gener
 module.exports = {
   project: {
     android: {
-      packageName: 'your.package.name', // must match your android apps package name, take a look into build.gradle
+      packageName: 'your.package.name', // must match your android apps package name, take a look into your apps build.gradle
     },
   },
 };
@@ -84,10 +82,16 @@ module.exports = {
 Once everything is setup you can call the init method on your JS:
 
 ```ts
-import { init, getUberRiderPorfile } from '@opacity-labs/react-native-opacity';
+import {
+  init,
+  getUberRiderPorfile,
+  OpacityEnvironment,
+} from '@opacity-labs/react-native-opacity';
 
-// ..
 useEffect(() => {
-  init('Your API key', false);
+  init('Your API key', false, OpacityEnvironment.PRODUCTION);
 }, []);
+
+// Later you can call the methods
+const res = getUberRiderProfile();
 ```

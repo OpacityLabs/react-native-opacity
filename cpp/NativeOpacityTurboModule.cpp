@@ -10,15 +10,16 @@ NativeOpacityTurboModule::NativeOpacityTurboModule(
     : NativeOpacityCxxSpec(std::move(jsinvoker)) {}
 
 jsi::Value NativeOpacityTurboModule::init(jsi::Runtime &rt, std::string api_key,
-                                          bool dry_run) {
+                                          bool dry_run, double environment) {
   jsi::Function promiseConstructor =
       rt.global().getPropertyAsFunction(rt, "Promise");
   return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
     auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
     auto reject = std::make_shared<jsi::Value>(rt, args[1]);
     std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt, api_key,
-                 dry_run]() {
-      int status = opacity_core::init(api_key.c_str(), dry_run);
+                 dry_run, environment]() {
+      int environment_int = static_cast<int>(environment);
+      int status = opacity_core::init(api_key.c_str(), dry_run, environment_int);
       if (status == opacity_core::OPACITY_OK) {
         jsInvoker->invokeAsync([&rt, resolve] {
           resolve->asObject(rt).asFunction(rt).call(rt, {});

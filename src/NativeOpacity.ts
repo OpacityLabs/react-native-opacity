@@ -2,7 +2,7 @@ import type { TurboModule } from 'react-native';
 import { TurboModuleRegistry } from 'react-native';
 
 export interface Spec extends TurboModule {
-  init(apiKey: string, dryRun: boolean): Promise<void>;
+  init(apiKey: string, dryRun: boolean, environment: number): Promise<void>;
   getUberRiderProfile(): Promise<{ data: string; proof: string }>;
   getUberRiderTripHistory(
     cursor: string

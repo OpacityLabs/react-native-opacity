@@ -5,8 +5,19 @@ type WorkflowResponse = {
   proof: string;
 };
 
-export function init(apiKey: string, dryRun: boolean): Promise<void> {
-  return Opacity.init(apiKey, dryRun);
+export enum OpacityEnvironment {
+  Test = 0,
+  Local = 1,
+  Staging = 2,
+  Produciton = 3,
+}
+
+export function init(
+  apiKey: string,
+  dryRun: boolean,
+  environment: OpacityEnvironment
+): Promise<void> {
+  return Opacity.init(apiKey, dryRun, environment);
 }
 
 export function getUberRiderProfile(): Promise<WorkflowResponse> {

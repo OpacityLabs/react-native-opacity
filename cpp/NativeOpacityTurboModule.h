@@ -13,7 +13,7 @@ class NativeOpacityTurboModule
     : public NativeOpacityCxxSpec<NativeOpacityTurboModule> {
 public:
   NativeOpacityTurboModule(std::shared_ptr<CallInvoker> jsInvoker);
-  jsi::Value init(jsi::Runtime &rt, std::string api_key, bool dry_run);
+  jsi::Value init(jsi::Runtime &rt, std::string api_key, bool dry_run, double environment);
   // uber
   jsi::Value getUberRiderProfile(jsi::Runtime &rt);
   jsi::Value getUberRiderTripHistory(jsi::Runtime &rt, jsi::String cursor);
