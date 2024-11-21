@@ -42,6 +42,8 @@ export interface Spec extends TurboModule {
     accountId: string,
     corporationId: string
   ): Promise<{ data: string; proof: string }>;
+  // github
+  getGithubProfile(): Promise<{ data: string; proof: string }>;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('Opacity');

@@ -116,6 +116,9 @@ export function getResource(
   alias: 'zabka:read:points'
 ): Promise<WorkflowResponse>;
 export function getResource(
+  alias: 'github:read:profile'
+): Promise<WorkflowResponse>;
+export function getResource(
   alias: string,
   ...args: any[]
 ): Promise<WorkflowResponse> {
@@ -144,6 +147,8 @@ export function getResource(
       return Opacity.getZabkaPoints();
     case 'uber:rider:read:fare_estimate':
       return Opacity.getUberFareEstimate(args[0], args[1], args[2], args[3]);
+    case 'github:read:profile':
+      return Opacity.getGithubProfile();
     default:
       throw Error('Resource not found');
   }
