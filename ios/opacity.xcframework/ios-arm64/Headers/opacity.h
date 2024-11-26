@@ -104,6 +104,16 @@ int32_t get_carta_corporation_securities(const char *account_id,
                                          char **proof_ptr,
                                          char **err_ptr);
 
+int32_t get_github_profile(char **json_ptr, char **proof_ptr, char **err_ptr);
+
+int32_t get_instagram_profile(char **json_ptr, char **proof_ptr, char **err_ptr);
+
+int32_t get_instagram_likes(char **json_ptr, char **proof_ptr, char **err_ptr);
+
+int32_t get_instagram_comments(char **json_ptr, char **proof_ptr, char **err_ptr);
+
+int32_t get_instagram_saved_posts(char **json_ptr, char **proof_ptr, char **err_ptr);
+
 extern double get_battery_level(void);
 
 extern const char *get_battery_status(void);
