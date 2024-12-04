@@ -114,6 +114,10 @@ int32_t get_instagram_comments(char **json_ptr, char **proof_ptr, char **err_ptr
 
 int32_t get_instagram_saved_posts(char **json_ptr, char **proof_ptr, char **err_ptr);
 
+int32_t get_23andme_profile(char **json_ptr, char **proof_ptr, char **err_ptr);
+
+int32_t get_23andme_computed_result(char **json_ptr, char **proof_ptr, char **err_ptr);
+
 extern double get_battery_level(void);
 
 extern const char *get_battery_status(void);
