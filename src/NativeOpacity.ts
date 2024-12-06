@@ -44,6 +44,11 @@ export interface Spec extends TurboModule {
   ): Promise<{ data: string; proof: string }>;
   // github
   getGithubProfile(): Promise<{ data: string; proof: string }>;
+  // instagram
+  getInstagramProfile(): Promise<{ data: string; proof: string }>;
+  getInstagramLikes(): Promise<{ data: string; proof: string }>;
+  getInstagramComments(): Promise<{ data: string; proof: string }>;
+  getInstagramSavedPosts(): Promise<{ data: string; proof: string }>;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('Opacity');

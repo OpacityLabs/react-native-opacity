@@ -39,5 +39,10 @@ namespace facebook::react
     jsi::Value getCartaCorporationSecurities(jsi::Runtime &rt, jsi::String account_id, jsi::String corporation_id);
     // github
     jsi::Value getGithubProfile(jsi::Runtime &rt);
+    // instagram 
+    jsi::Value getInstagramProfile(jsi::Runtime &rt);
+    jsi::Value getInstagramLikes(jsi::Runtime &rt);
+    jsi::Value getInstagramComments(jsi::Runtime &rt);
+    jsi::Value getInstagramSavedPosts(jsi::Runtime &rt);
   };
 } // namespace facebook::react

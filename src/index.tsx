@@ -119,6 +119,18 @@ export function getResource(
   alias: 'github:read:profile'
 ): Promise<WorkflowResponse>;
 export function getResource(
+  alias: 'instagram:read:profile'
+): Promise<WorkflowResponse>;
+export function getResource(
+  alias: 'instagram:read:likes'
+): Promise<WorkflowResponse>;
+export function getResource(
+  alias: 'instagram:read:comments'
+): Promise<WorkflowResponse>;
+export function getResource(
+  alias: 'instagram:read:saved_posts'
+): Promise<WorkflowResponse>;
+export function getResource(
   alias: string,
   ...args: any[]
 ): Promise<WorkflowResponse> {
@@ -149,6 +161,14 @@ export function getResource(
       return Opacity.getUberFareEstimate(args[0], args[1], args[2], args[3]);
     case 'github:read:profile':
       return Opacity.getGithubProfile();
+    case 'instagram:read:profile':
+      return Opacity.getInstagramProfile();
+    case 'instagram:read:likes':
+      return Opacity.getInstagramLikes();
+    case 'instagram:read:comments':
+      return Opacity.getInstagramComments();
+    case 'instagram:read:saved_posts':
+      return Opacity.getInstagramSavedPosts();
     default:
       throw Error('Resource not found');
   }
