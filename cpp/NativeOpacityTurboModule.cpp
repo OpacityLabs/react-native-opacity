@@ -831,7 +831,7 @@ jsi::Value NativeOpacityTurboModule::getInstagramComments(jsi::Runtime &rt)
 }
 
 
-jsi::Value NativeOpacityTurboModule::getInstagramSavedPosts::Runtime &rt)
+jsi::Value NativeOpacityTurboModule::getInstagramSavedPosts(jsi::Runtime &rt)
   {
     jsi::Function promiseConstructor =
         rt.global().getPropertyAsFunction(rt, "Promise");
