@@ -16,10 +16,11 @@ jsi::Value NativeOpacityTurboModule::init(jsi::Runtime &rt, std::string api_key,
   return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
     auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
     auto reject = std::make_shared<jsi::Value>(rt, args[1]);
-    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt, api_key,
-                 dry_run, environment]() {
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt, api_key, dry_run,
+                 environment]() {
       int environment_int = static_cast<int>(environment);
-      int status = opacity_core::init(api_key.c_str(), dry_run, environment_int);
+      int status =
+          opacity_core::init(api_key.c_str(), dry_run, environment_int);
       if (status == opacity_core::OPACITY_OK) {
         jsInvoker->invokeAsync([&rt, resolve] {
           resolve->asObject(rt).asFunction(rt).call(rt, {});
@@ -682,15 +683,13 @@ jsi::Value NativeOpacityTurboModule::getCartaCorporationSecurities(
   }));
 }
 
-jsi::Value NativeOpacityTurboModule::getGithubProfile(jsi::Runtime &rt)
-  {
-    jsi::Function promiseConstructor =
-        rt.global().getPropertyAsFunction(rt, "Promise");
+jsi::Value NativeOpacityTurboModule::getGithubProfile(jsi::Runtime &rt) {
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
         return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
-      auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
-      auto reject = std::make_shared<jsi::Value>(rt, args[1]);
-      std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt]()
-                  {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt]() {
       char *json;
       char *proof;
       char *err;
@@ -713,21 +712,19 @@ jsi::Value NativeOpacityTurboModule::getGithubProfile(jsi::Runtime &rt)
               rt, jsi::String::createFromUtf8(rt, err));
           reject->asObject(rt).asFunction(rt).call(rt, error);
         });
-      }; })
-          .detach();
-      return {};
+      };
+    }).detach();
+    return {};
   }));
 }
 
-jsi::Value NativeOpacityTurboModule::getInstagramProfile(jsi::Runtime &rt)
-  {
-    jsi::Function promiseConstructor =
-        rt.global().getPropertyAsFunction(rt, "Promise");
+jsi::Value NativeOpacityTurboModule::getInstagramProfile(jsi::Runtime &rt) {
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
         return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
-      auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
-      auto reject = std::make_shared<jsi::Value>(rt, args[1]);
-      std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt]()
-                  {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt]() {
       char *json;
       char *proof;
       char *err;
@@ -750,21 +747,19 @@ jsi::Value NativeOpacityTurboModule::getInstagramProfile(jsi::Runtime &rt)
               rt, jsi::String::createFromUtf8(rt, err));
           reject->asObject(rt).asFunction(rt).call(rt, error);
         });
-      }; })
-          .detach();
-      return {};
+      };
+    }).detach();
+    return {};
   }));
 }
 
-jsi::Value NativeOpacityTurboModule::getInstagramLikes(jsi::Runtime &rt)
-  {
-    jsi::Function promiseConstructor =
-        rt.global().getPropertyAsFunction(rt, "Promise");
+jsi::Value NativeOpacityTurboModule::getInstagramLikes(jsi::Runtime &rt) {
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
         return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
-      auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
-      auto reject = std::make_shared<jsi::Value>(rt, args[1]);
-      std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt]()
-                  {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt]() {
       char *json;
       char *proof;
       char *err;
@@ -787,21 +782,19 @@ jsi::Value NativeOpacityTurboModule::getInstagramLikes(jsi::Runtime &rt)
               rt, jsi::String::createFromUtf8(rt, err));
           reject->asObject(rt).asFunction(rt).call(rt, error);
         });
-      }; })
-          .detach();
-      return {};
+      };
+    }).detach();
+    return {};
   }));
 }
 
-jsi::Value NativeOpacityTurboModule::getInstagramComments(jsi::Runtime &rt)
-  {
-    jsi::Function promiseConstructor =
-        rt.global().getPropertyAsFunction(rt, "Promise");
+jsi::Value NativeOpacityTurboModule::getInstagramComments(jsi::Runtime &rt) {
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
         return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
-      auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
-      auto reject = std::make_shared<jsi::Value>(rt, args[1]);
-      std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt]()
-                  {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt]() {
       char *json;
       char *proof;
       char *err;
@@ -824,22 +817,19 @@ jsi::Value NativeOpacityTurboModule::getInstagramComments(jsi::Runtime &rt)
               rt, jsi::String::createFromUtf8(rt, err));
           reject->asObject(rt).asFunction(rt).call(rt, error);
         });
-      }; })
-          .detach();
-      return {};
+      };
+    }).detach();
+    return {};
   }));
 }
 
-
-jsi::Value NativeOpacityTurboModule::getInstagramSavedPosts(jsi::Runtime &rt)
-  {
-    jsi::Function promiseConstructor =
-        rt.global().getPropertyAsFunction(rt, "Promise");
+jsi::Value NativeOpacityTurboModule::getInstagramSavedPosts(jsi::Runtime &rt) {
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
         return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
-      auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
-      auto reject = std::make_shared<jsi::Value>(rt, args[1]);
-      std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt]()
-                  {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt]() {
       char *json;
       char *proof;
       char *err;
@@ -862,9 +852,82 @@ jsi::Value NativeOpacityTurboModule::getInstagramSavedPosts(jsi::Runtime &rt)
               rt, jsi::String::createFromUtf8(rt, err));
           reject->asObject(rt).asFunction(rt).call(rt, error);
         });
-      }; })
-          .detach();
-      return {};
+      };
+    }).detach();
+    return {};
+  }));
+}
+
+// Gusto
+jsi::Value NativeOpacityTurboModule::getGustoMembersTable(jsi::Runtime &rt) {
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
+        return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt]() {
+      char *json;
+      char *proof;
+      char *err;
+
+      int status = opacity_core::get_gusto_members_table(&json, &proof, &err);
+
+      if (status == opacity_core::OPACITY_OK) {
+        jsInvoker->invokeAsync([&rt, resolve, json] {
+          auto data = jsi::String::createFromUtf8(rt, json);
+          auto proof = jsi::String::createFromUtf8(rt, "");
+          auto res = jsi::Object(rt);
+          res.setProperty(rt, "data", data);
+          res.setProperty(rt, "proof", proof);
+          resolve->asObject(rt).asFunction(rt).call(rt, res);
+        });
+      } else {
+        jsInvoker->invokeAsync([&rt, reject, err] {
+          auto errorCtr = rt.global().getPropertyAsFunction(rt, "Error");
+          auto error = errorCtr.callAsConstructor(
+              rt, jsi::String::createFromUtf8(rt, err));
+          reject->asObject(rt).asFunction(rt).call(rt, error);
+        });
+      };
+    }).detach();
+
+    return {};
+  }));
+}
+
+jsi::Value NativeOpacityTurboModule::getGustoPayrollAdminId(jsi::Runtime &rt) {
+  jsi::Function promiseConstructor =
+      rt.global().getPropertyAsFunction(rt, "Promise");
+        return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt]() {
+      char *json;
+      char *proof;
+      char *err;
+
+      int status = opacity_core::get_gusto_payroll_admin_id(&json, &proof, &err);
+
+      if (status == opacity_core::OPACITY_OK) {
+        jsInvoker->invokeAsync([&rt, resolve, json] {
+          auto data = jsi::String::createFromUtf8(rt, json);
+          auto proof = jsi::String::createFromUtf8(rt, "");
+          auto res = jsi::Object(rt);
+          res.setProperty(rt, "data", data);
+          res.setProperty(rt, "proof", proof);
+          resolve->asObject(rt).asFunction(rt).call(rt, res);
+        });
+      } else {
+        jsInvoker->invokeAsync([&rt, reject, err] {
+          auto errorCtr = rt.global().getPropertyAsFunction(rt, "Error");
+          auto error = errorCtr.callAsConstructor(
+              rt, jsi::String::createFromUtf8(rt, err));
+          reject->asObject(rt).asFunction(rt).call(rt, error);
+        });
+      };
+    }).detach();
+
+    return {};
   }));
 }
 } // namespace facebook::react

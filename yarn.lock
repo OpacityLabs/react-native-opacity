@@ -3269,6 +3269,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-native-dotenv@npm:^0.2.2":
+  version: 0.2.2
+  resolution: "@types/react-native-dotenv@npm:0.2.2"
+  checksum: a300037b84e7ae7db7f2609aa0893eccf596c5a78f6215b2733a8dfb7172277766a058f21a6852a223926763e6d3fc34da2a980d30ded585c555994db322a537
+  languageName: node
+  linkType: hard
+
 "@types/react@npm:^18.2.44":
   version: 18.3.5
   resolution: "@types/react@npm:18.3.5"
@@ -10877,6 +10884,7 @@ __metadata:
     "@react-native/babel-preset": 0.75.2
     "@react-native/metro-config": 0.75.2
     "@react-native/typescript-config": 0.75.2
+    "@types/react-native-dotenv": ^0.2.2
     react: 18.3.1
     react-native: 0.75.2
     react-native-builder-bob: ^0.30.2

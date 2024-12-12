@@ -2,7 +2,7 @@ import Opacity from './NativeOpacity';
 
 type WorkflowResponse = {
   data: string;
-  proof: string;
+  proof?: string;
 };
 
 export enum OpacityEnvironment {
@@ -68,6 +68,14 @@ export function getZabkaAccount(): Promise<WorkflowResponse> {
 
 export function getZabkaPoints(): Promise<WorkflowResponse> {
   return Opacity.getZabkaPoints();
+}
+
+export function getGustoMembersTable(): Promise<WorkflowResponse> {
+  return Opacity.getGustoMembersTable();
+}
+
+export function getGustoPayrollAdminId(): Promise<WorkflowResponse> {
+  return Opacity.getGustoPayrollAdminId();
 }
 
 export function getResource(
@@ -169,6 +177,10 @@ export function getResource(
       return Opacity.getInstagramComments();
     case 'instagram:read:saved_posts':
       return Opacity.getInstagramSavedPosts();
+    case 'gusto:read:members_table':
+      return Opacity.getGustoMembersTable();
+    case 'gusto:read:payroll_admin_id':
+      return Opacity.getGustoPayrollAdminId();
     default:
       throw Error('Resource not found');
   }
