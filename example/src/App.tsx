@@ -5,6 +5,7 @@ import {
   init,
   OpacityEnvironment,
   getGustoMembersTable,
+  getResource,
 } from '@opacity-labs/react-native-opacity';
 
 export default function App() {
@@ -40,6 +41,15 @@ export default function App() {
     }
   };
 
+  const getGithubProfileCallback = async () => {
+    try {
+      const githubProfile = await getResource('github:read:profile');
+      console.log(githubProfile);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text>Opacity RN app</Text>
@@ -51,6 +61,7 @@ export default function App() {
         title="Get gusto member table account"
         onPress={getGustoMemberTable}
       />
+      <Button title="Get github profile" onPress={getGithubProfileCallback} />
     </View>
   );
 }
