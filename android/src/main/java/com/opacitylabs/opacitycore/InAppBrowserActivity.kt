@@ -50,6 +50,7 @@ class InAppBrowserActivity : AppCompatActivity() {
             val json =
                 "{\"event\": \"close\", \"id\": \"${System.currentTimeMillis().toString()}\"}"
             OpacityCore.emitWebviewEvent(json)
+            finish()
         }
 
         val layoutParams =
@@ -63,12 +64,6 @@ class InAppBrowserActivity : AppCompatActivity() {
 
         OpacityCore.getRuntime().webExtensionController.installBuiltIn("resource://android/assets/extension/")
             .accept { ext ->
-                if (ext != null) {
-                    Log.d("InAppBrowserActivity", "WebExtension successfully installed")
-                    // Set the MessageDelegate or do further initialization here
-                } else {
-                    Log.e("InAppBrowserActivity", "Failed to install WebExtension")
-                }
                 ext?.setMessageDelegate(
                     object : WebExtension.MessageDelegate {
                         override fun onMessage(

@@ -57,7 +57,6 @@ object OpacityCore {
   fun closeBrowser() {
     val closeIntent = Intent("com.opacitylabs.opacitycore.CLOSE_BROWSER")
     LocalBroadcastManager.getInstance(appContext).sendBroadcast(closeIntent)
-    Log.d("OpacityCore", "Intent dispatched")
   }
 
   private external fun init(): Int
