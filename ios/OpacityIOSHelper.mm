@@ -47,21 +47,22 @@ void ios_set_request_header(const char *key, const char *value) {
 void ios_present_webview() {
   dispatch_async(dispatch_get_main_queue(), ^{
     if (modalWebVC != nil) {
-      [modalWebVC openRequest:request];
-    } else {
-      modalWebVC = [[ModalWebViewController alloc] initWithRequest:request];
-
-      // Create a navigation controller to embed the modal web view controller
-      navController = [[UINavigationController alloc]
-          initWithRootViewController:modalWebVC];
-
-      // Get the topmost view controller
-      UIViewController *topController = topMostViewController();
-
-      [topController presentViewController:navController
-                                  animated:YES
-                                completion:nil];
+      modalWebVC = nil;
+      navController = nil;
     }
+
+    modalWebVC = [[ModalWebViewController alloc] initWithRequest:request];
+
+    // Create a navigation controller to embed the modal web view controller
+    navController =
+        [[UINavigationController alloc] initWithRootViewController:modalWebVC];
+
+    // Get the topmost view controller
+    UIViewController *topController = topMostViewController();
+
+    [topController presentViewController:navController
+                                animated:YES
+                              completion:nil];
   });
 }
 
