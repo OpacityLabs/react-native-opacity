@@ -34,11 +34,13 @@ extern const int32_t OPACITY_ENVIRONMENT_PRODUCTION;
 
 int32_t init(const char *api_key_str, bool dry_run, int32_t backend_environment);
 
-void execute_workflow(const char *flow);
+int32_t get(const char *name,
+            const char *params,
+            char **json_ptr,
+            char **proof_ptr,
+            char **err_ptr);
 
 void emit_webview_event(const char *payload);
-
-bool is_key_stored(const char *key);
 
 const char *start(const char *request);
 
@@ -118,12 +120,6 @@ int32_t get_23andme_profile(char **json_ptr, char **proof_ptr, char **err_ptr);
 
 int32_t get_23andme_computed_result(char **json_ptr, char **proof_ptr, char **err_ptr);
 
-int32_t get(const char *name,
-            const char *params,
-            char **json_ptr,
-            char **proof_ptr,
-            char **err_ptr);
-
 int32_t get_gusto_members_table(char **json_ptr, char **proof_ptr, char **err_ptr);
 
 int32_t get_gusto_payroll_admin_id(char **json_ptr, char **proof_ptr, char **err_ptr);
@@ -168,11 +164,11 @@ extern bool is_wifi_connected(void);
 
 extern bool is_rooted(void);
 
+const char *verify(const char *proof);
+
 extern void secure_set(const char *key, const char *value);
 
 extern const char *secure_get(const char *key);
-
-const char *verify(const char *proof);
 
 extern void android_prepare_request(const char *_url);
 
