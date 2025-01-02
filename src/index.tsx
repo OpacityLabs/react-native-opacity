@@ -78,6 +78,13 @@ export function getGustoPayrollAdminId(): Promise<WorkflowResponse> {
   return Opacity.getGustoPayrollAdminId();
 }
 
+export function get(
+  name: string,
+  params?: Record<string, any>
+): Promise<WorkflowResponse> {
+  return Opacity.getInternal(name, params ? JSON.stringify(params) : null);
+}
+
 export function getResource(
   alias: 'uber:rider:read:trip_history',
   cursor: string

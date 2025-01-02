@@ -898,7 +898,7 @@ jsi::Value NativeOpacityTurboModule::getGustoMembersTable(jsi::Runtime &rt) {
 jsi::Value NativeOpacityTurboModule::getGustoPayrollAdminId(jsi::Runtime &rt) {
   jsi::Function promiseConstructor =
       rt.global().getPropertyAsFunction(rt, "Promise");
-        return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
+      return promiseConstructor.callAsConstructor(rt, HOSTFN("promise") {
     auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
     auto reject = std::make_shared<jsi::Value>(rt, args[1]);
     std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt]() {
@@ -925,6 +925,52 @@ jsi::Value NativeOpacityTurboModule::getGustoPayrollAdminId(jsi::Runtime &rt) {
           reject->asObject(rt).asFunction(rt).call(rt, error);
         });
       };
+    }).detach();
+
+    return {};
+  }));
+}
+
+jsi::Value NativeOpacityTurboModule::getInternal(jsi::Runtime &rt, jsi::String name, std::optional<jsi::String> params) {
+  auto name_str = name.utf8(rt);
+  std::string params_str;
+  if(params.has_value()) {
+    params_str = params.value().utf8(rt);
+  }
+  
+  auto promise_ctr = rt.global().getPropertyAsFunction(rt, "Promise");
+  return promise_ctr.callAsConstructor(rt, HOSTFN("promise") {
+    auto resolve = std::make_shared<jsi::Value>(rt, args[0]);
+    auto reject = std::make_shared<jsi::Value>(rt, args[1]);
+    std::thread([resolve, reject, jsInvoker = jsInvoker_, &rt, name_str, params_str]() {
+      char *json;
+      char *proof;
+      char *err;
+      
+      const char* params = params_str.empty() ? nullptr : params_str.c_str();
+      int status = opacity_core::get(name_str.c_str(), params, &json, &proof, &err);
+
+      if (status == opacity_core::OPACITY_OK) {
+        jsInvoker->invokeAsync([&rt, resolve, json] {
+          auto data = jsi::String::createFromUtf8(rt, json);
+          auto proof = jsi::String::createFromUtf8(rt, "");
+          auto res = jsi::Object(rt);
+          res.setProperty(rt, "data", data);
+          res.setProperty(rt, "proof", proof);
+          resolve->asObject(rt).asFunction(rt).call(rt, res);
+          opacity_core::free_string(json);
+//          opacity_core::free_string(proof);
+        });
+      } else {
+        jsInvoker->invokeAsync([&rt, reject, err] {
+          auto errorCtr = rt.global().getPropertyAsFunction(rt, "Error");
+          auto error = errorCtr.callAsConstructor(
+              rt, jsi::String::createFromUtf8(rt, err));
+          reject->asObject(rt).asFunction(rt).call(rt, error);
+          opacity_core::free_string(err);
+        });
+      };
+      
     }).detach();
 
     return {};

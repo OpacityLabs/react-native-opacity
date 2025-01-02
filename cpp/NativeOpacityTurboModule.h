@@ -53,5 +53,7 @@ public:
   // Gusto
   jsi::Value getGustoMembersTable(jsi::Runtime &rt);
   jsi::Value getGustoPayrollAdminId(jsi::Runtime &rt);
+  // Generic get call
+  jsi::Value getInternal(jsi::Runtime &rt, jsi::String name, std::optional<jsi::String> params);
 };
 } // namespace facebook::react

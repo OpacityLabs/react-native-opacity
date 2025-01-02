@@ -40,6 +40,8 @@ int32_t get(const char *name,
             char **proof_ptr,
             char **err_ptr);
 
+void free_string(char *ptr);
+
 void emit_webview_event(const char *payload);
 
 const char *start(const char *request);

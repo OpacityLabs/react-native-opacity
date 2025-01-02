@@ -96,16 +96,16 @@
 // Called when the web view starts to load a page
 //- (void)webView:(WKWebView *)webView
 //    didStartProvisionalNavigation:(WKNavigation *)navigation {
-//  NSLog(@"Started loading: %@", webView.URL.absoluteString);
+//  NSLog(@"🔹 Started loading: %@", webView.URL.absoluteString);
 //}
-//
-//// Called when the content starts arriving for a page
+
+/// Called when the content starts arriving for a page
 //- (void)webView:(WKWebView *)webView
 //    didCommitNavigation:(WKNavigation *)navigation {
 //  NSLog(@"Content started arriving: %@", webView.URL.absoluteString);
 //}
-//
-//// Called when the page finishes loading
+
+/// Called when the page finishes loading
 - (void)webView:(WKWebView *)webView
     didFinishNavigation:(WKNavigation *)navigation {
   NSURL *url = webView.URL;
@@ -119,19 +119,41 @@
                                                         timeIntervalSince1970]]
            forKey:@"id"];
 
-    [dict setObject:self.cookies forKey:@"cookies"];
+    // Insert the HTML body inside of 'html_body'
+    // And also append ALL the cookies
+    [webView evaluateJavaScript:@"document.documentElement.outerHTML.toString()"
+              completionHandler:^(NSString *html, NSError *error) {
+                if (!error) {
+                  [dict setObject:html forKey:@"html_body"];
+                } else {
+                  NSLog(@"Error fetching the body of html: %@", error);
+                }
 
-    NSError *error;
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict
-                                                       options:0
-                                                         error:&error];
-    NSString *payload = [[NSString alloc] initWithData:jsonData
-                                              encoding:NSUTF8StringEncoding];
+                // Use WKHTTPCookieStore to get all cookies after JavaScript
+                // evaluation
+                WKHTTPCookieStore *cookieStore =
+                    self.webView.configuration.websiteDataStore.httpCookieStore;
+                [cookieStore getAllCookies:^(NSArray<NSHTTPCookie *> *cookies) {
+                  for (NSHTTPCookie *cookie in cookies) {
+                    // Update self.cookies with the latest cookies
+                    [self.cookies setObject:cookie.value forKey:cookie.name];
+                  }
+                  [dict setObject:self.cookies forKey:@"cookies"];
 
-    opacity_core::emit_webview_event([payload UTF8String]);
+                  NSError *error;
+                  NSData *jsonData =
+                      [NSJSONSerialization dataWithJSONObject:dict
+                                                      options:0
+                                                        error:&error];
+                  NSString *payload =
+                      [[NSString alloc] initWithData:jsonData
+                                            encoding:NSUTF8StringEncoding];
+
+                  opacity_core::emit_webview_event([payload UTF8String]);
+                }];
+              }];
   }
 }
-
 // -(void)webView:(WKWebView *)webView
 // didReceiveServerRedirectForProvisionalNavigation:(WKNavigation *)navigation {
 //     NSLog(@"🟥 didReceiveServerRedirectForProvisionalNavigation");
@@ -239,38 +261,24 @@
                     decisionHandler:
                         (void (^)(WKNavigationActionPolicy))decisionHandler {
 
-  NSURLRequest *request = navigationAction.request;
-  NSURLSession *session =
-      [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration
-                                                 defaultSessionConfiguration]
-                                    delegate:self
-                               delegateQueue:nil];
-  NSURLSessionDataTask *task = [session
-      dataTaskWithRequest:request
-        completionHandler:^(NSData *data, NSURLResponse *response,
-                            NSError *error) {
-          if (error) {
-            NSLog(@"Could not extract cookies from url: %@, with error: %@",
-                  request.URL, error.localizedDescription);
-          }
+  /// We potentially want to intercept navigation requests with deeplinks
+  /// A deeplink might take you out of the current app and into the service app
+  /// The problem is by canceling the redirection none of the other handlers are
+  /// triggered. Which means the cookies at the moment of the redirection are
+  /// not sent to Rust. We could potentially move the code of
+  /// didFailProvisionalNavigation here and it might work... I don't know, this
+  /// needs testing. For now allowing all redirections causes the deeplinks we
+  /// need to fail which then triggeres didFailProvisionalNavigation and
+  /// extracts and sends the requests to Rust and then to Lua
+  //  NSURLRequest *request = navigationAction.request;
+  //  NSURL *url = request.URL;
+  //  if (![url.scheme isEqualToString:@"http"] &&
+  //      ![url.scheme isEqualToString:@"https"]) {
+  //    decisionHandler(WKNavigationActionPolicyCancel);
+  //    return;
+  //  }
 
-          if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
-            NSHTTPURLResponse *resp = (NSHTTPURLResponse *)response;
-
-            NSDictionary *diction = [resp allHeaderFields];
-
-            NSArray *cookies =
-                [NSHTTPCookie cookiesWithResponseHeaderFields:diction
-                                                       forURL:[resp URL]];
-
-            for (NSHTTPCookie *cookie in cookies) {
-              [self.cookies setObject:cookie.value forKey:cookie.name];
-            }
-          }
-
-          decisionHandler(WKNavigationActionPolicyAllow);
-        }];
-  [task resume];
+  decisionHandler(WKNavigationActionPolicyAllow);
 }
 
 @end

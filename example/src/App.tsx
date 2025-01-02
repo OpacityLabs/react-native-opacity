@@ -6,6 +6,7 @@ import {
   OpacityEnvironment,
   getGustoMembersTable,
   getResource,
+  get,
 } from '@opacity-labs/react-native-opacity';
 
 export default function App() {
@@ -50,6 +51,14 @@ export default function App() {
     }
   };
 
+  const runFalingLua = async () => {
+    try {
+      await get('Quack');
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text>Opacity RN app</Text>
@@ -62,6 +71,7 @@ export default function App() {
         onPress={getGustoMemberTable}
       />
       <Button title="Get github profile" onPress={getGithubProfileCallback} />
+      <Button title="Failing lua" onPress={runFalingLua} />
     </View>
   );
 }

@@ -53,6 +53,11 @@ export interface Spec extends TurboModule {
   // Gusto
   getGustoMembersTable(): Promise<{ data: string; proof?: string }>;
   getGustoPayrollAdminId(): Promise<{ data: string; proof?: string }>;
+  // "get" clashes with the default methods in turbo modules
+  getInternal(
+    name: string,
+    params: string | null
+  ): Promise<{ data: string; proof?: string }>;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('Opacity');
