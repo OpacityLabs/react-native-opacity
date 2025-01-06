@@ -9,7 +9,7 @@ export enum OpacityEnvironment {
   Test = 0,
   Local = 1,
   Staging = 2,
-  Produciton = 3,
+  Production = 3,
 }
 
 export function init(

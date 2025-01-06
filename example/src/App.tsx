@@ -1,13 +1,33 @@
 import { useEffect } from 'react';
 import { StyleSheet, View, Text, Button } from 'react-native';
 import {
-  getUberRiderProfile,
   init,
   OpacityEnvironment,
   getGustoMembersTable,
   getResource,
   get,
 } from '@opacity-labs/react-native-opacity';
+
+let env = OpacityEnvironment.Production as OpacityEnvironment;
+let envString = 'Test';
+
+switch (env) {
+  case OpacityEnvironment.Test:
+    envString = 'Test';
+    break;
+  case OpacityEnvironment.Local:
+    envString = 'Local';
+    break;
+  case OpacityEnvironment.Staging:
+    envString = 'Staging';
+    break;
+  case OpacityEnvironment.Production:
+    envString = 'Production';
+    break;
+  default:
+    envString = 'Unknown';
+    break;
+}
 
 export default function App() {
   useEffect(() => {
@@ -17,16 +37,14 @@ export default function App() {
       return;
     }
 
-    init(process.env.OPACITY_API_KEY!, false, OpacityEnvironment.Staging).catch(
-      (error) => {
-        console.error(`FAILED TO INITIALIZE SDK: ${error}`);
-      }
-    );
+    init(process.env.OPACITY_API_KEY!, false, env).catch((error) => {
+      console.error(`FAILED TO INITIALIZE SDK: ${error}`);
+    });
   }, []);
 
   const getUberRiderProfileCallback = async () => {
     try {
-      const riderProfile = await getUberRiderProfile();
+      const riderProfile = await get('flow:uber_rider:profile');
       console.log(riderProfile);
     } catch (error) {
       console.error(error);
@@ -62,6 +80,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text>Opacity RN app</Text>
+      <Text>Running against environment: {envString}</Text>
       <Button
         title="Get uber rider profile"
         onPress={getUberRiderProfileCallback}
