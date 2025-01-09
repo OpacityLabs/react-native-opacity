@@ -81,3 +81,7 @@ lib/
 ios/generated
 android/generated
 example/.env
+
+# Rust binaries
+android/src/jniLibs
+ios/opacity.xcframework
