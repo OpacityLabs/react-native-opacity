@@ -3,7 +3,6 @@ import { StyleSheet, View, Text, Button } from 'react-native';
 import {
   init,
   OpacityEnvironment,
-  getGustoMembersTable,
   getResource,
   get,
 } from '@opacity-labs/react-native-opacity';
@@ -51,15 +50,6 @@ export default function App() {
     }
   };
 
-  const getGustoMemberTable = async () => {
-    try {
-      const gustoMemberTable = await getGustoMembersTable();
-      console.log(gustoMemberTable);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const getGithubProfileCallback = async () => {
     try {
       const githubProfile = await getResource('github:read:profile');
@@ -84,10 +74,6 @@ export default function App() {
       <Button
         title="Get uber rider profile"
         onPress={getUberRiderProfileCallback}
-      />
-      <Button
-        title="Get gusto member table account"
-        onPress={getGustoMemberTable}
       />
       <Button title="Get github profile" onPress={getGithubProfileCallback} />
       <Button title="Failing lua" onPress={runFalingLua} />

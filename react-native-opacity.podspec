@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
   if File.exist?('ios/opacity-debug.xcframework')
     s.vendored_frameworks = 'ios/opacity-debug.xcframework'
   else
-    s.vendored_frameworks = 'ios/opacity.xcframework'
+    s.dependency 'OpacityCore', '3.23.50'
   end
 
   s.frameworks = "WebKit", "CoreTelephony", "CoreLocation", "SystemConfiguration"

@@ -64,11 +64,20 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
+            BuildableName = "OpacityRN.app"
+            BlueprintName = "OpacityRN"
+            ReferencedContainer = "container:OpacityRN.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
             BuildableName = "OpacityExample.app"
             BlueprintName = "OpacityExample"
             ReferencedContainer = "container:OpacityExample.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -86,6 +95,15 @@
             ReferencedContainer = "container:OpacityExample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
+            BuildableName = "OpacityExample.app"
+            BlueprintName = "OpacityExample"
+            ReferencedContainer = "container:OpacityExample.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

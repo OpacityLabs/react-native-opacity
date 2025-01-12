@@ -6,8 +6,6 @@
   "main": "./lib/commonjs/index.js",
   "module": "./lib/module/index.js",
   "exports": {
-    "./react-native.config.js": "./react-native.config.js",
-    "./package.json": "./package.json",
     ".": {
       "import": {
         "types": "./lib/typescript/module/src/index.d.ts",
@@ -25,9 +23,8 @@
     "android",
     "ios",
     "cpp",
-    "include",
-    "react-native.config.js",
     "*.podspec",
+    "react-native.config.js",
     "!ios/build",
     "!android/build",
     "!android/gradle",
@@ -69,8 +66,8 @@
   "devDependencies": {
     "@commitlint/config-conventional": "^17.0.2",
     "@evilmartians/lefthook": "^1.5.0",
+    "@react-native-community/cli": "15.0.1",
     "@react-native/eslint-config": "^0.73.1",
-    "@release-it/conventional-changelog": "^5.0.0",
     "@types/jest": "^29.5.5",
     "@types/react": "^18.2.44",
     "commitlint": "^17.0.2",
@@ -81,10 +78,8 @@
     "jest": "^29.7.0",
     "prettier": "^3.0.3",
     "react": "18.3.1",
-    "react-native": "0.75.2",
-    "react-native-builder-bob": "^0.30.2",
-    "release-it": "^15.0.0",
-    "turbo": "^1.10.7",
+    "react-native": "0.76.6",
+    "react-native-builder-bob": "^0.35.2",
     "typescript": "^5.2.2"
   },
   "resolutions": {
@@ -104,23 +99,6 @@
       "<rootDir>/example/node_modules",
       "<rootDir>/lib/"
     ]
-  },
-  "release-it": {
-    "git": {
-      "commitMessage": "chore: release ${version}",
-      "tagName": "v${version}"
-    },
-    "npm": {
-      "publish": true
-    },
-    "github": {
-      "release": true
-    },
-    "plugins": {
-      "@release-it/conventional-changelog": {
-        "preset": "angular"
-      }
-    }
   },
   "eslintConfig": {
     "root": true,
@@ -184,15 +162,17 @@
     "type": "modules",
     "jsSrcsDir": "src",
     "outputDir": {
+      "ios": "ios/generated",
       "android": "android/generated"
     },
     "android": {
       "javaPackageName": "com.opacitylabs.opacitycore"
-    }
+    },
+    "includesGeneratedCode": true
   },
   "create-react-native-library": {
-    "type": "module-new",
-    "languages": "cpp",
-    "version": "0.41.1"
+    "type": "turbo-module",
+    "languages": "kotlin-objc",
+    "version": "0.45.5"
   }
 }
