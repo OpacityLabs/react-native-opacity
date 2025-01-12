@@ -11,7 +11,7 @@ class MainActivity : ReactActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    OpacityCore.initialize(this)
+    OpacityCore.setContext(this)
   }
 
   /**
