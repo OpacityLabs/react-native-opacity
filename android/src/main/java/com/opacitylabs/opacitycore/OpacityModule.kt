@@ -1,5 +1,6 @@
 package com.opacitylabs.opacitycore
 
+import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.module.annotations.ReactModule
@@ -37,13 +38,11 @@ class OpacityModule(reactContext: ReactApplicationContext) : NativeOpacitySpec(r
   override fun getInternal(name: String, params: String?, promise: Promise) {
     CoroutineScope(Dispatchers.IO).launch {
       try {
-        val res = OpacityCore.get(name, params) // Assuming this is a blocking call
-        val profileMap: Map<String, Any?> = mapOf(
-          "json" to res.json,
-          // "proof" to res.proof
-        )
+        val res = OpacityCore.get(name, params)
+        val map = Arguments.createMap()
+        map.putString("json", res.json)
         withContext(Dispatchers.Main) {
-          promise.resolve(profileMap) // Resolve promise on the main thread
+          promise.resolve(map) // Resolve promise on the main thread
         }
       } catch (e: Exception) {
         withContext(Dispatchers.Main) {

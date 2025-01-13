@@ -3,11 +3,10 @@ import { StyleSheet, View, Text, Button } from 'react-native';
 import {
   init,
   OpacityEnvironment,
-  getResource,
   get,
 } from '@opacity-labs/react-native-opacity';
 
-let env = OpacityEnvironment.Production as OpacityEnvironment;
+let env = OpacityEnvironment.Test as OpacityEnvironment;
 let envString = 'Test';
 
 switch (env) {
@@ -52,7 +51,7 @@ export default function App() {
 
   const getGithubProfileCallback = async () => {
     try {
-      const githubProfile = await getResource('github:read:profile');
+      const githubProfile = await get('github:read:profile');
       console.log(githubProfile);
     } catch (error) {
       console.error(error);
@@ -62,6 +61,15 @@ export default function App() {
   const runFalingLua = async () => {
     try {
       await get('Quack');
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const runSampleLuaFlow = async () => {
+    try {
+      const res = await get('sha256');
+      console.warn('got res: ', res);
     } catch (e) {
       console.error(e);
     }
@@ -77,6 +85,7 @@ export default function App() {
       />
       <Button title="Get github profile" onPress={getGithubProfileCallback} />
       <Button title="Failing lua" onPress={runFalingLua} />
+      <Button title="Sample Lua flow" onPress={runSampleLuaFlow} />
     </View>
   );
 }
