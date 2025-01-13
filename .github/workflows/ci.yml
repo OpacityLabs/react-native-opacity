@@ -108,6 +108,7 @@ jobs:
         run: |
           cd example/ios
           pod repo update
+          pod update hermes-engine
           pod install
 
       - name: Build example for iOS
