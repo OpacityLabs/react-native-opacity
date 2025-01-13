@@ -86,7 +86,7 @@ jobs:
           yarn run build:android
 
   build-ios:
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -107,9 +107,8 @@ jobs:
       - name: Install cocoapods
         run: |
           cd example/ios
+          pod repo update
           pod install
-        env:
-          NO_FLIPPER: 1
 
       - name: Build example for iOS
         run: |
