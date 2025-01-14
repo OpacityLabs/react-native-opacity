@@ -15,12 +15,7 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/OpacityLabs/react-native-opacity.git", :tag => "#{s.version}" }
 
   s.source_files = "ios/**/*.{h,m,mm}", "cpp/**/*.{hpp,cpp,c,h}"
-
-  if File.exist?('ios/opacity-debug.xcframework')
-    s.vendored_frameworks = 'ios/opacity-debug.xcframework'
-  else
-    s.dependency 'OpacityCore', '3.23.50'
-  end
+  s.dependency 'OpacityCore', '3.23.50'
 
   s.frameworks = "WebKit", "CoreTelephony", "CoreLocation", "SystemConfiguration"
 
