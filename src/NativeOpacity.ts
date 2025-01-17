@@ -5,7 +5,7 @@ export interface Spec extends TurboModule {
   init(apiKey: string, dryRun: boolean, environment: number): Promise<void>;
   getInternal(
     name: string,
-    params: string | null
+    params?: Object
   ): Promise<{ data: string; proof?: string }>;
 }
 

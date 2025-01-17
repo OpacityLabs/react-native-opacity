@@ -166,7 +166,7 @@
       "android": "android/generated"
     },
     "android": {
-      "javaPackageName": "com.opacitylabs.opacitycore"
+      "javaPackageName": "com.opacitylabs.rn"
     },
     "includesGeneratedCode": true
   },

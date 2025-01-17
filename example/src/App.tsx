@@ -75,6 +75,15 @@ export default function App() {
     }
   };
 
+  const runGenerateSignature = async () => {
+    try {
+      const res = await get('generate_proof');
+      console.log('got res: ', res);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text>Opacity RN app</Text>
@@ -86,6 +95,7 @@ export default function App() {
       <Button title="Get github profile" onPress={getGithubProfileCallback} />
       <Button title="Failing lua" onPress={runFalingLua} />
       <Button title="Sample Lua flow" onPress={runSampleLuaFlow} />
+      <Button title="Generate signature" onPress={runGenerateSignature} />
     </View>
   );
 }

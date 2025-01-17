@@ -1,13 +1,14 @@
-package com.opacitylabs.opacitycore
+package com.opacitylabs.rn
 
-import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.module.annotations.ReactModule
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.opacitylabs.opacitycore.OpacityCore
 
 @ReactModule(name = OpacityModule.NAME)
 class OpacityModule(reactContext: ReactApplicationContext) : NativeOpacitySpec(reactContext) {
@@ -35,14 +36,13 @@ class OpacityModule(reactContext: ReactApplicationContext) : NativeOpacitySpec(r
     }
   }
 
-  override fun getInternal(name: String, params: String?, promise: Promise) {
+  override fun getInternal(name: String, params: ReadableMap?, promise: Promise) {
     CoroutineScope(Dispatchers.IO).launch {
       try {
-        val res = OpacityCore.get(name, params)
-        val map = Arguments.createMap()
-        map.putString("json", res.json)
+        val res = OpacityCore.get(name, params?.toHashMap())
+        val resMap = mapToWritableMap(res)
         withContext(Dispatchers.Main) {
-          promise.resolve(map) // Resolve promise on the main thread
+          promise.resolve(resMap) // Resolve promise on the main thread
         }
       } catch (e: Exception) {
         withContext(Dispatchers.Main) {

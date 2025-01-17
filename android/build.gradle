@@ -49,7 +49,7 @@ def supportsNamespace() {
 
 android {
   if (supportsNamespace()) {
-    namespace "com.opacitylabs.opacitycore"
+    namespace "com.opacitylabs.rn"
 
     sourceSets {
       main {
@@ -120,13 +120,13 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   implementation "androidx.security:security-crypto:1.1.0-alpha06"
   implementation "org.mozilla.geckoview:geckoview-nightly:132.0.20240918041351"
-  api "com.github.OpacityLabs:opacity-android:3.23.50"
+  api "com.github.OpacityLabs:opacity-android:4.0.4"
 }
 
 if (isNewArchitectureEnabled()) {
   react {
     jsRootDir = file("../src/")
     libraryName = "Opacity"
-    codegenJavaPackageName = "com.opacitylabs.opacitycore"
+    codegenJavaPackageName = "com.opacitylabs.rn"
   }
 }

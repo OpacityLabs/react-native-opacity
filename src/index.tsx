@@ -24,5 +24,5 @@ export function get(
   name: string,
   params?: Record<string, any>
 ): Promise<WorkflowResponse> {
-  return Opacity.getInternal(name, params ? JSON.stringify(params) : null);
+  return Opacity.getInternal(name, params);
 }
