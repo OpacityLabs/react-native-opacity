@@ -1,7 +1,8 @@
 import Opacity from './NativeOpacity';
 
 type WorkflowResponse = {
-  data: string;
+  json: Record<string, any>;
+  signature?: string;
   proof?: string;
 };
 
@@ -20,9 +21,10 @@ export function init(
   return Opacity.init(apiKey, dryRun, environment);
 }
 
-export function get(
+export async function get(
   name: string,
   params?: Record<string, any>
 ): Promise<WorkflowResponse> {
-  return Opacity.getInternal(name, params);
+  let res = await Opacity.getInternal(name, params);
+  return res as WorkflowResponse;
 }

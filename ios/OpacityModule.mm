@@ -37,20 +37,16 @@ OpacityEnvironment opacityEnvironmentFromDouble(double value) {
 }
 
 - (void)getInternal:(NSString *)name
-             params:(NSString *_Nullable)params
+             params:(NSDictionary *_Nullable)params
             resolve:(RCTPromiseResolveBlock)resolve
              reject:(RCTPromiseRejectBlock)reject {
   [OpacityObjCWrapper get:name
                 andParams:params
-               completion:^(NSString *json, NSString *proof, NSError *error) {
+               completion:^(NSDictionary *res, NSError *error) {
                  if (error) {
                    reject(@"FlowError", [error localizedDescription], NULL);
                  } else {
-                   NSDictionary *result = @{@"json" : json
-//                                            Proofs are disabled for now
-//                                            , @"proof" : proof
-                   };
-                   resolve(result);
+                   resolve(res);
                  }
                }];
 }
