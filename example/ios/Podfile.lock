@@ -1243,7 +1243,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-opacity (3.23.13):
+  - react-native-opacity (0.0.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1776,7 +1776,7 @@ SPEC CHECKSUMS:
   React-logger: 162c09cc432b02d4a0db31b1d98f6df5243a2679
   React-Mapbuffer: f760d2229640be48cb3c2d4832b5bbc3018123fc
   React-microtasksnativemodule: 1364ae5354f51b3ecee8eb718b5b6d1686d2ff4d
-  react-native-opacity: 8272fc6c904a795fa8b9bda27e6c84bcaf0d6229
+  react-native-opacity: c6bbdd9a697e74226145db2f27adbe3ddb0c20a4
   React-nativeconfig: 539ff4de6ce3b694e8e751080568c281c84903ce
   React-NativeModulesApple: 771cc40b086281b820fe455fedebbe4341fd0c90
   React-perflogger: 4e80a5b8d61dfb38024e7d5b8efaf9ce1037d31f
@@ -1807,6 +1807,6 @@ SPEC CHECKSUMS:
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: be6f55a028e86c83ae066f018e9b5d24ffc45436
 
-PODFILE CHECKSUM: 5734cee69b961b7c8c8f3750afe2ab23092f08db
+PODFILE CHECKSUM: e7b10166a797a650ac96d08b424ebbcc5eeba39f
 
 COCOAPODS: 1.16.2
