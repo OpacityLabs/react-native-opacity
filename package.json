@@ -22,6 +22,7 @@
     "src",
     "android",
     "ios",
+    "lib",
     "cpp",
     "*.podspec",
     "react-native.config.js",
@@ -40,7 +41,7 @@
     "example": "yarn workspace react-native-opacity-example",
     "test": "jest",
     "typecheck": "tsc",
-    "lint": "eslint \"**/*.{js,ts,tsx}\"",
+    "prepack": "bob build",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
     "prepare": "bob build",
     "release": "release-it"
