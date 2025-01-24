@@ -16,11 +16,12 @@ OpacityEnvironment opacityEnvironmentFromDouble(double value) {
   }
 }
 
-- (void)init:(NSString *)apiKey
-         dryRun:(BOOL)dryRun
-    environment:(double)environment
-        resolve:(RCTPromiseResolveBlock)resolve
-         reject:(RCTPromiseRejectBlock)reject {
+RCT_EXPORT_METHOD(init
+                  : (NSString *)apiKey dryRun
+                  : (BOOL)dryRun environment
+                  : (double)environment resolve
+                  : (RCTPromiseResolveBlock)resolve reject
+                  : (RCTPromiseRejectBlock)reject) {
 
   OpacityEnvironment env = opacityEnvironmentFromDouble(environment);
 
@@ -36,10 +37,11 @@ OpacityEnvironment opacityEnvironmentFromDouble(double value) {
   }
 }
 
-- (void)getInternal:(NSString *)name
-             params:(NSDictionary *_Nullable)params
-            resolve:(RCTPromiseResolveBlock)resolve
-             reject:(RCTPromiseRejectBlock)reject {
+RCT_EXPORT_METHOD(getInternal
+                  : (NSString *)name params
+                  : (NSDictionary *)params resolve
+                  : (RCTPromiseResolveBlock)resolve reject
+                  : (RCTPromiseRejectBlock)reject) {
   [OpacityObjCWrapper get:name
                 andParams:params
                completion:^(NSDictionary *res, NSError *error) {
@@ -51,9 +53,11 @@ OpacityEnvironment opacityEnvironmentFromDouble(double value) {
                }];
 }
 
+#if RCT_NEW_ARCH_ENABLED
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
     (const facebook::react::ObjCTurboModule::InitParams &)params {
   return std::make_shared<facebook::react::NativeOpacitySpecJSI>(params);
 }
+#endif
 
 @end
