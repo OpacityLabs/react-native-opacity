@@ -91,13 +91,12 @@ android {
     targetCompatibility JavaVersion.VERSION_1_8
   }
 
-  sourceSets {
-    main {
-      if (isNewArchitectureEnabled()) {
-          java.srcDirs += [
-            "generated/java",
-            "generated/jni"
-          ]
+  sourceSets.main {
+    java {
+      if(isNewArchitectureEnabled()) {
+        srcDirs += ['src/newarch',
+        // This is needed to build Kotlin project with NewArch enabled
+          "${project.buildDir}/generated/source/codegen/java"]
       }
     }
   }
