@@ -10,10 +10,25 @@ yarn add @opacity-labs/react-native-opacity
 
 ## iOS
 
-- You need to bump your minimum deployment target to iOS 14 (Via Xcode → [YOUR TARGET] → General → Deployment Target)
-- Do a `pod install` Module is a Turbo Module, therefore you need to enable the new arch. (RCT_ENABLE_NEW_ARCH=1 pod install)
+You need to bump your minimum deployment target to iOS 14. On the latest versions of RN this should be the default target, if not you can do it via:
 
-If you are pulling on the latest version cocoapods sometimes refuses to update it's main repo specs. You can force an update via:
+```
+Xcode → Project Explorer → [YOUR TARGET] → General → Deployment Target
+```
+
+Do a `pod install` Module is a Turbo Module, therefore you need to enable the new arch. Again, on the latest RN versions the new architecture should be turned on by default if not run:
+
+```
+cd ios && RCT_ENABLE_NEW_ARCH=1 pod install
+```
+
+Or modify the top of your podfile and do a pod install:
+
+```ruby
+env['RCT_ENABLE_NEW_ARCH'] = '1'
+```
+
+If you are pulling on the latest version the package, sometimes cocoapods refuses to update it's main repo specs. You can force an update via:
 
 ```sh
 rm -rf ~/.cocoapods/repos/trunk
