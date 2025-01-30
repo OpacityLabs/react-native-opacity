@@ -1,5 +1,6 @@
 package com.opacitylabs.rn
 
+import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableMap
@@ -11,10 +12,15 @@ import kotlinx.coroutines.withContext
 import com.opacitylabs.opacitycore.OpacityCore
 
 @ReactModule(name = OpacityModule.NAME)
-class OpacityModule(reactContext: ReactApplicationContext) : NativeOpacitySpec(reactContext) {
+class OpacityModule(private val reactContext: ReactApplicationContext) : NativeOpacitySpec(reactContext),
+  LifecycleEventListener {
 
   override fun getName(): String {
     return NAME
+  }
+
+  init {
+    reactContext.addLifecycleEventListener(this)
   }
 
   override fun init(apiKey: String, dryRun: Boolean, environment: Double, promise: Promise) {
@@ -49,6 +55,22 @@ class OpacityModule(reactContext: ReactApplicationContext) : NativeOpacitySpec(r
           promise.reject("ERROR", e.message, e) // Reject promise on the main thread
         }
       }
+    }
+  }
+
+  override fun onHostDestroy() {
+//    TODO("Not yet implemented")
+  }
+
+  override fun onHostPause() {
+//    TODO("Not yet implemented")
+  }
+
+  override fun onHostResume() {
+    val activity = currentActivity
+    if (activity != null) {
+      OpacityCore.setContext(activity)
+      reactContext.removeLifecycleEventListener(this) // Cleanup listener
     }
   }
 

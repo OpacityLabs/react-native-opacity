@@ -6,25 +6,21 @@ import {
   get,
 } from '@opacity-labs/react-native-opacity';
 
-let env = OpacityEnvironment.Test as OpacityEnvironment;
-let envString = 'Test';
+let env = OpacityEnvironment.Production as OpacityEnvironment;
 
-switch (env) {
-  case OpacityEnvironment.Test:
-    envString = 'Test';
-    break;
-  case OpacityEnvironment.Local:
-    envString = 'Local';
-    break;
-  case OpacityEnvironment.Staging:
-    envString = 'Staging';
-    break;
-  case OpacityEnvironment.Production:
-    envString = 'Production';
-    break;
-  default:
-    envString = 'Unknown';
-    break;
+function envToString(env: OpacityEnvironment): string {
+  switch (env) {
+    case OpacityEnvironment.Test:
+      return 'Test';
+    case OpacityEnvironment.Local:
+      return 'Local';
+    case OpacityEnvironment.Staging:
+      return 'Staging';
+    case OpacityEnvironment.Production:
+      return 'Production';
+    default:
+      return 'Unknown';
+  }
 }
 
 export default function App() {
@@ -87,7 +83,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text>Opacity RN app</Text>
-      <Text>Running against environment: {envString}</Text>
+      <Text>Running against environment: {envToString(env)}</Text>
       <Button
         title="Get uber rider profile"
         onPress={getUberRiderProfileCallback}

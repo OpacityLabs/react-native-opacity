@@ -39,30 +39,12 @@ allprojects {
 On your apps `AndroidManifest.xml` add an activity:
 
 ```xml
+    // Your other activities, don't nest this tag ↓
       <activity
         android:name="com.opacitylabs.opacitycore.InAppBrowserActivity"
-        android:theme="@style/Theme.AppCompat.DayNight" />
+        android:theme="@style/Theme.AppCompat.DayNight"
+      />
     // Just above the closing tag of "application"
-    </application>
-```
-
-On your main activity you need to initialize the library (kotlin snippet):
-
-```kotlin
-import android.os.Bundle // add this import
-import com.facebook.react.ReactActivity
-import com.facebook.react.ReactActivityDelegate
-import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
-import com.facebook.react.defaults.DefaultReactActivityDelegate
-import com.opacitylabs.opacitycore.OpacityCore // add this import
-
-class MainActivity : ReactActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) { // add this method
-    super.onCreate(savedInstanceState)
-    OpacityCore.initialize(this)
-  }
-  // ...
-}
 ```
 
 ## JS
@@ -88,9 +70,7 @@ import {
   OpacityEnvironment,
 } from '@opacity-labs/react-native-opacity';
 
-useEffect(() => {
-  init('Your API key', false, OpacityEnvironment.PRODUCTION);
-}, []);
+init('Your API key', false, OpacityEnvironment.PRODUCTION);
 
 // Later you can call the methods
 const res = getUberRiderProfile();
