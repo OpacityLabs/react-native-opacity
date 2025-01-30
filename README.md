@@ -23,13 +23,14 @@ RCT_ENABLE_NEW_ARCH=1 pod install --repo-update
 
 ## Android
 
-First add the necessary repos to download the dependencies. On your root `build.gradle` add:
+First add the necessary repos to download the dependencies. On your root `android/build.gradle` add:
 
-```
+```groovy
 allprojects {
   repositories {
     google()
     mavenCentral()
+    // If you already have allprojects->respositories just make sure you have these two added
     maven { url "https://maven.mozilla.org/maven2/" }
     maven { url 'https://jitpack.io' }
   }
@@ -39,7 +40,7 @@ allprojects {
 On your apps `AndroidManifest.xml` add an activity:
 
 ```xml
-    // Your other activities, don't nest this tag ↓
+    // Your other activities, don't nest this activity tag ↓
       <activity
         android:name="com.opacitylabs.opacitycore.InAppBrowserActivity"
         android:theme="@style/Theme.AppCompat.DayNight"
