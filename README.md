@@ -55,12 +55,11 @@ allprojects {
 On your apps `AndroidManifest.xml` add an activity:
 
 ```xml
-    // Your other activities, don't nest this activity tag ↓
+      // Put this on the same level as other activities
       <activity
         android:name="com.opacitylabs.opacitycore.InAppBrowserActivity"
         android:theme="@style/Theme.AppCompat.DayNight"
       />
-    // Just above the closing tag of "application"
 ```
 
 ## JS
