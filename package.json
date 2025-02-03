@@ -20,6 +20,7 @@
   },
   "files": [
     "app.plugin.js",
+    "expo-plugin",
     "src",
     "android",
     "ios",
@@ -42,10 +43,11 @@
     "example": "yarn workspace react-native-opacity-example",
     "test": "jest",
     "typecheck": "tsc",
-    "prepack": "bob build",
+    "prepack": "bob build && yarn build:expo:plugin",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
-    "prepare": "bob build",
-    "release": "release-it"
+    "prepare": "bob build && yarn build:expo:plugin",
+    "release": "release-it",
+    "build:expo:plugin": "tsc -p ./expo-plugin/tsconfig.json"
   },
   "keywords": [
     "react-native",
