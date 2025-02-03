@@ -3,8 +3,8 @@ const {
   withProjectBuildGradle,
 } = require('@expo/config-plugins');
 
-module.exports = function withCombinedPlugin(config) {
-  return withAndroidManifest(config, async (config) => {
+module.exports = function withOpacity(config) {
+  config = withAndroidManifest(config, (config) => {
     let androidManifest = config.modResults.manifest;
 
     // Add the tools to apply permission remove
@@ -28,17 +28,19 @@ module.exports = function withCombinedPlugin(config) {
     });
 
     return config;
-  }).then((config) => {
-    return withProjectBuildGradle(config, async (config) => {
-      if (!config.modResults.contents.match('maven.mozilla.org')) {
-        config.modResults.contents = config.modResults.contents.replace(
-          /mavenCentral\(\)/g,
-          `
-          mavenCentral()
-          maven { url "https://maven.mozilla.org/maven2/" }`
-        );
-      }
-      return config;
-    });
   });
+
+  config = withProjectBuildGradle(config, (config) => {
+    if (!config.modResults.contents.match('maven.mozilla.org')) {
+      config.modResults.contents = config.modResults.contents.replace(
+        /mavenCentral\(\)/g,
+        `
+        mavenCentral()
+        maven { url "https://maven.mozilla.org/maven2/" }`
+      );
+    }
+    return config;
+  });
+
+  return config;
 };
