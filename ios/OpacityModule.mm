@@ -19,7 +19,8 @@ OpacityEnvironment opacityEnvironmentFromDouble(double value) {
 RCT_EXPORT_METHOD(init
                   : (NSString *)apiKey dryRun
                   : (BOOL)dryRun environment
-                  : (double)environment resolve
+                  : (double)environment shouldShowErrorsInWebView
+                  : (BOOL)shouldShowErrorsInWebView resolve
                   : (RCTPromiseResolveBlock)resolve reject
                   : (RCTPromiseRejectBlock)reject) {
 
@@ -27,7 +28,8 @@ RCT_EXPORT_METHOD(init
 
   int status = [OpacityObjCWrapper initialize:apiKey
                                     andDryRun:dryRun
-                               andEnvironment:env];
+                               andEnvironment:env
+                 andShouldShowErrorsInWebview:shouldShowErrorsInWebView];
 
   if (status == 0) {
     resolve(nil);

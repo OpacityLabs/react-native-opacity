@@ -1,41 +1,9 @@
-import { useEffect } from 'react';
-import { StyleSheet, View, Text, Button } from 'react-native';
-import {
-  init,
-  OpacityEnvironment,
-  get,
-} from '@opacity-labs/react-native-opacity';
-
-let env = OpacityEnvironment.Production as OpacityEnvironment;
-
-function envToString(env: OpacityEnvironment): string {
-  switch (env) {
-    case OpacityEnvironment.Test:
-      return 'Test';
-    case OpacityEnvironment.Local:
-      return 'Local';
-    case OpacityEnvironment.Staging:
-      return 'Staging';
-    case OpacityEnvironment.Production:
-      return 'Production';
-    default:
-      return 'Unknown';
-  }
-}
+import { get } from '@opacity-labs/react-native-opacity';
+import { Button, StyleSheet, Text, View } from 'react-native';
+import { opacityEnvironment } from './opacitySDK';
+import { envToString } from './utils';
 
 export default function App() {
-  useEffect(() => {
-    let apiKey = process.env.OPACITY_API_KEY;
-    if (!apiKey) {
-      console.error('API key not found');
-      return;
-    }
-
-    init(process.env.OPACITY_API_KEY!, false, env).catch((error) => {
-      console.error(`FAILED TO INITIALIZE SDK: ${error}`);
-    });
-  }, []);
-
   const getUberRiderProfileCallback = async () => {
     try {
       const riderProfile = await get('flow:uber_rider:profile');
@@ -80,10 +48,20 @@ export default function App() {
     }
   };
 
+  const runLuaTerminate = async () => {
+    try {
+      const res = await get('terminate');
+      console.log('got res: ', res);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <Text>Opacity RN app</Text>
-      <Text>Running against environment: {envToString(env)}</Text>
+      <Text style={styles.text}>
+        Running against environment: {envToString(opacityEnvironment)}
+      </Text>
       <Button
         title="Get uber rider profile"
         onPress={getUberRiderProfileCallback}
@@ -92,6 +70,7 @@ export default function App() {
       <Button title="Failing lua" onPress={runFalingLua} />
       <Button title="Sample Lua flow" onPress={runSampleLuaFlow} />
       <Button title="Generate signature" onPress={runGenerateSignature} />
+      <Button title="Terminate" onPress={runLuaTerminate} />
     </View>
   );
 }
@@ -101,6 +80,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#333',
+  },
+  text: {
+    color: 'white',
   },
   box: {
     width: 60,

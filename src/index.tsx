@@ -13,12 +13,28 @@ export enum OpacityEnvironment {
   Production = 3,
 }
 
-export function init(
-  apiKey: string,
-  dryRun: boolean,
-  environment: OpacityEnvironment
-): Promise<void> {
-  return Opacity.init(apiKey, dryRun, environment);
+export async function init({
+  apiKey,
+  dryRun = false,
+  environment,
+  shouldShowErrorsInWebView = true,
+}: {
+  apiKey: string;
+  dryRun?: boolean;
+  environment: OpacityEnvironment;
+  shouldShowErrorsInWebView?: boolean;
+}): Promise<void> {
+  try {
+    let res = await Opacity.init(
+      apiKey,
+      dryRun,
+      environment,
+      shouldShowErrorsInWebView
+    );
+    return res;
+  } catch (e) {
+    console.error('Could not initialize OpacitySDK', e);
+  }
 }
 
 export async function get(

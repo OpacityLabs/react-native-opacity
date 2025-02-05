@@ -13,10 +13,13 @@ yarn add @opacity-labs/react-native-opacity
 If you are using an Expo app, the native configuration changes below have been abstracted into an expo-plugin, just add it to the plugins section in you `app.json`:
 
 ```json
-  plugins: [
-    ...,
+{
+  // In the plugins sectino add the following
+  "plugins": [
+    // ...,
     "@opacity-labs/react-native-opacity"
   ]
+}
 ```
 
 # Bare React Native App
