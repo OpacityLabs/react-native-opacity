@@ -121,7 +121,7 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   implementation "androidx.security:security-crypto:1.1.0-alpha06"
   implementation "org.mozilla.geckoview:geckoview-nightly:132.0.20240918041351"
-  api "com.github.OpacityLabs:opacity-android:4.0.14"
+  api "com.github.OpacityLabs:opacity-android:5.0.0"
 }
 
 if (isNewArchitectureEnabled()) {

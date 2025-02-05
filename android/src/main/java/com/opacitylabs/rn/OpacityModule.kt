@@ -12,7 +12,8 @@ import kotlinx.coroutines.withContext
 import com.opacitylabs.opacitycore.OpacityCore
 
 @ReactModule(name = OpacityModule.NAME)
-class OpacityModule(private val reactContext: ReactApplicationContext) : NativeOpacitySpec(reactContext),
+class OpacityModule(private val reactContext: ReactApplicationContext) :
+  NativeOpacitySpec(reactContext),
   LifecycleEventListener {
 
   override fun getName(): String {
@@ -23,7 +24,13 @@ class OpacityModule(private val reactContext: ReactApplicationContext) : NativeO
     reactContext.addLifecycleEventListener(this)
   }
 
-  override fun init(apiKey: String, dryRun: Boolean, environment: Double, promise: Promise) {
+  override fun init(
+    apiKey: String,
+    dryRun: Boolean,
+    environment: Double,
+    shouldShowErrorsInWebView: Boolean,
+    promise: Promise
+  ) {
     val environmentEnum = when (environment) {
       0.0 -> OpacityCore.Environment.TEST
       1.0 -> OpacityCore.Environment.LOCAL
@@ -34,8 +41,8 @@ class OpacityModule(private val reactContext: ReactApplicationContext) : NativeO
         return
       }
     }
-    val status = OpacityCore.initialize(apiKey, dryRun, environmentEnum)
-    if(status != 0) {
+    val status = OpacityCore.initialize(apiKey, dryRun, environmentEnum, shouldShowErrorsInWebView)
+    if (status != 0) {
       promise.reject("SDK Error", "Could not initialize SDK, check the native logs")
     } else {
       promise.resolve(null)
