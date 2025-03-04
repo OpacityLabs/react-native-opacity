@@ -1,6 +1,7 @@
 import { init, OpacityEnvironment } from '@opacity-labs/react-native-opacity';
 
-export const opacityEnvironment = OpacityEnvironment.Test as OpacityEnvironment;
+export const opacityEnvironment =
+  OpacityEnvironment.Production as OpacityEnvironment;
 let apiKey = process.env.OPACITY_API_KEY;
 
 if (!apiKey) {

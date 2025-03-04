@@ -41,7 +41,7 @@
     "!**/.*"
   ],
   "scripts": {
-    "example": "yarn workspace react-native-opacity-example",
+    "example": "yarn workspace example",
     "test": "jest",
     "typecheck": "tsc",
     "prepack": "bob build && yarn build:expo:plugin",

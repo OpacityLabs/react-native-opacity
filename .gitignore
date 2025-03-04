@@ -85,3 +85,4 @@ example/.env
 # Rust binaries
 android/src/jniLibs
 ios/*.xcframework
+example/android/.kotlin
