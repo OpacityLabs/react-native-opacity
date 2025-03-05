@@ -1,4 +1,5 @@
 import { init, OpacityEnvironment } from '@opacity-labs/react-native-opacity';
+import Toast from 'react-native-toast-message';
 
 export const opacityEnvironment =
   OpacityEnvironment.Production as OpacityEnvironment;
@@ -8,10 +9,22 @@ if (!apiKey) {
   console.error('API key not found');
 }
 
-init({
-  apiKey: process.env.OPACITY_API_KEY!,
-  environment: opacityEnvironment,
-  shouldShowErrorsInWebView: false,
-}).catch((error) => {
-  console.error(`FAILED TO INITIALIZE SDK: ${error}`);
-});
+export const initializeSDK = async () => {
+  try {
+    await init({
+      apiKey: process.env.OPACITY_API_KEY!,
+      environment: opacityEnvironment,
+      shouldShowErrorsInWebView: false,
+    });
+    Toast.show({
+      type: 'success',
+      text1: 'SDK Initialized!',
+    });
+  } catch (e) {
+    Toast.show({
+      type: 'error',
+      text1: 'Error initializing SDK',
+      text2: `${e}`,
+    });
+  }
+};

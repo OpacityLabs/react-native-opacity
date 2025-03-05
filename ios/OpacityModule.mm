@@ -25,17 +25,18 @@ RCT_EXPORT_METHOD(init
                   : (RCTPromiseRejectBlock)reject) {
 
   OpacityEnvironment env = opacityEnvironmentFromDouble(environment);
+  NSError *error;
 
   int status = [OpacityObjCWrapper initialize:apiKey
                                     andDryRun:dryRun
                                andEnvironment:env
-                 andShouldShowErrorsInWebview:shouldShowErrorsInWebView];
+                 andShouldShowErrorsInWebview:shouldShowErrorsInWebView
+                                    andError:&error];
 
   if (status == 0) {
     resolve(nil);
   } else {
-    reject(@"SDKInitializationError",
-           @"Could not initialize SDK, check the native logs", NULL);
+    reject([NSString stringWithFormat:@"%d", status], [error localizedDescription], NULL);
   }
 }
 

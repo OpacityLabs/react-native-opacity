@@ -1,11 +1,17 @@
 import { get } from '@opacity-labs/react-native-opacity';
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
-import { opacityEnvironment } from './opacitySDK';
+import { initializeSDK, opacityEnvironment } from './opacitySDK';
 import { envToString } from './utils';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import Toast from 'react-native-toast-message';
 
 export default function App() {
   const [inputFlow, setInputFlow] = useState('');
+
+  useEffect(() => {
+    initializeSDK();
+  }, []);
+
   const runLuaFlow = async () => {
     try {
       const res = await get(inputFlow.toLowerCase());
@@ -31,6 +37,8 @@ export default function App() {
         onChangeText={setInputFlow}
       />
       <Button title="Run Lua flow" onPress={runLuaFlow} />
+      <Button title="Re-initiate SDK" onPress={initializeSDK} />
+      <Toast />
     </View>
   );
 }
@@ -44,11 +52,6 @@ const styles = StyleSheet.create({
   },
   text: {
     color: 'white',
-  },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
   },
   input: {
     height: 40,
