@@ -41,11 +41,11 @@ class OpacityModule(private val reactContext: ReactApplicationContext) :
         return
       }
     }
-    val status = OpacityCore.initialize(apiKey, dryRun, environmentEnum, shouldShowErrorsInWebView)
-    if (status != 0) {
-      promise.reject("SDK Error", "Could not initialize SDK, check the native logs")
-    } else {
+    try {
+      OpacityCore.initialize(apiKey, dryRun, environmentEnum, shouldShowErrorsInWebView)
       promise.resolve(null)
+    } catch (e: Exception) {
+      promise.reject("Initialization Error", e.message, e)
     }
   }
 
