@@ -118,7 +118,7 @@ dependencies {
   //noinspection GradleDynamicVersion
   implementation "com.facebook.react:react-native:+"
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  api "com.github.OpacityLabs:opacity-android:5.2.18"
+  api "com.github.OpacityLabs:opacity-android:5.2.21"
 }
 
 if (isNewArchitectureEnabled()) {
