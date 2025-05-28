@@ -9,8 +9,9 @@ type WorkflowResponse = {
 export enum OpacityEnvironment {
   Test = 0,
   Local = 1,
-  Staging = 2,
-  Production = 3,
+  Sandbox = 2,
+  Staging = 3,
+  Production = 4,
 }
 
 export async function init({
