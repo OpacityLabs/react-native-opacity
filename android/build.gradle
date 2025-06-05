@@ -1,8 +1,7 @@
-import com.android.Version
-
 buildscript {
-  // Buildscript is evaluated before everything else so we can't use getExtOrDefault
-  def kotlin_version = rootProject.ext.has("kotlinVersion") ? rootProject.ext.get("kotlinVersion") : project.properties["Opacity_kotlinVersion"]
+  ext.getExtOrDefault = {name ->
+    return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties['Dupli_' + name]
+  }
 
   repositories {
     google()
@@ -10,67 +9,34 @@ buildscript {
   }
 
   dependencies {
-    classpath "com.android.tools.build:gradle:7.2.1"
+    classpath "com.android.tools.build:gradle:8.7.2"
     // noinspection DifferentKotlinGradleVersion
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${getExtOrDefault('kotlinVersion')}"
   }
 }
 
-def reactNativeArchitectures() {
-  def value = rootProject.getProperties().get("reactNativeArchitectures")
-  return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
-}
-
-def isNewArchitectureEnabled() {
-  return rootProject.hasProperty("newArchEnabled") && rootProject.getProperty("newArchEnabled") == "true"
-}
 
 apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 
-if (isNewArchitectureEnabled()) {
-  apply plugin: "com.facebook.react"
-}
-
-def getExtOrDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["Opacity_" + name]
-}
+apply plugin: "com.facebook.react"
 
 def getExtOrIntegerDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["Opacity_" + name]).toInteger()
-}
-
-static def supportsNamespace() {
-  def parsed = Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')
-  def major = parsed[0].toInteger()
-  def minor = parsed[1].toInteger()
-
-  // Namespace support was added in 7.3.0
-  return (major == 7 && minor >= 3) || major >= 8
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["Dupli_" + name]).toInteger()
 }
 
 android {
-  if (supportsNamespace()) {
-    namespace "com.opacitylabs.rn"
+  namespace "com.opacitylabs.rn"
 
-    sourceSets {
-      main {
-        manifest.srcFile "src/main/AndroidManifestNew.xml"
-      }
-    }
-  }
-
-  buildFeatures {
-    prefab true
-  }
+  // buildFeatures {
+  //   prefab true
+  // }
 
   compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
 
   defaultConfig {
     minSdkVersion getExtOrIntegerDefault("minSdkVersion")
     targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
-    buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
-
   }
 
   buildFeatures {
@@ -92,13 +58,12 @@ android {
     targetCompatibility JavaVersion.VERSION_1_8
   }
 
-  sourceSets.main {
-    java {
-      if(isNewArchitectureEnabled()) {
-        srcDirs += ['src/newarch',
-        // This is needed to build Kotlin project with NewArch enabled
-          "${project.buildDir}/generated/source/codegen/java"]
-      }
+  sourceSets {
+    main {
+      java.srcDirs += [
+        "generated/java",
+        "generated/jni"
+      ]
     }
   }
 }

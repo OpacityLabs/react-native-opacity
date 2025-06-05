@@ -25,7 +25,6 @@ class OpacityPackage : BaseReactPackage() {
                       OpacityModule.NAME,
                       false, // canOverrideExistingModule
                       false, // needsEagerInit
-                      true, // hasConstants
                       false, // isCxxModule
                       true // isTurboModule
               )
