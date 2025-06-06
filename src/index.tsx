@@ -3,7 +3,7 @@ import Opacity from './NativeOpacity';
 type WorkflowResponse = {
   json: Record<string, any>;
   signature?: string;
-  proof?: string;
+  hash?: string;
 };
 
 export enum OpacityEnvironment {
@@ -38,6 +38,19 @@ export async function init({
   }
 }
 
+/**
+ * Main function to get a flow response from Opacity.
+ *
+ * Each flow might define its own parameters, so check the flow documentation for available parameters.
+ *
+ * **WARNING** The response is dynamic and the return type is not strictly defined, it's mostly there as a convenience.
+ *
+ * Therefore, be sure to check for the existence of the properties you expect in the response.
+ *
+ * @param name name of the flow to execute e.g. "github:profile"
+ * @param params optional parameters to pass to the flow, check the flow documentation for available parameters
+ * @returns WorkflowResponse containing the JSON response from the flow, and optionally a signature and hash
+ */
 export async function get(
   name: string,
   params?: Record<string, any>
