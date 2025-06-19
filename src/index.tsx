@@ -1,9 +1,10 @@
 import Opacity from './NativeOpacity';
 
 type WorkflowResponse = {
-  json: Record<string, any>;
-  signature?: string;
-  hash?: string;
+  payload: any;
+  message: string;
+  signature: string;
+  hash: string;
 };
 
 export enum OpacityEnvironment {
