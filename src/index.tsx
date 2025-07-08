@@ -1,5 +1,15 @@
 import Opacity from './NativeOpacity';
 
+export class OpacityError extends Error {
+  code: string;
+
+  constructor(code: string, message: string) {
+    super(message);
+    this.name = 'OpacityError';
+    this.code = code;
+  }
+}
+
 type WorkflowResponse = {
   payload: any;
   message: string;
@@ -55,7 +65,22 @@ export async function init({
 export async function get(
   name: string,
   params?: Record<string, any>
-): Promise<WorkflowResponse> {
-  let res = await Opacity.getInternal(name, params);
-  return res as WorkflowResponse;
+): Promise<{ response?: WorkflowResponse; error?: OpacityError }> {
+  try {
+    let res = await Opacity.getInternal(name, params);
+    return {
+      response: res as WorkflowResponse,
+    };
+  } catch (e: any) {
+    // this error should be a RN error that has a non-standard "code" property that we use to describe the error codes
+    if (e.code) {
+      return {
+        error: new OpacityError(e.code, e.message),
+      };
+    } else {
+      return {
+        error: new OpacityError('UnknownError', e.message),
+      };
+    }
+  }
 }

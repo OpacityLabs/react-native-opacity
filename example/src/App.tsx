@@ -13,11 +13,11 @@ export default function App() {
   }, []);
 
   const runLuaFlow = async () => {
-    try {
-      const res = await get(inputFlow.toLowerCase());
-      console.log('got res: ', res);
-    } catch (e) {
-      console.error(e);
+    const { response, error } = await get(inputFlow.toLowerCase());
+    if (error) {
+      console.error(error.code, error.message);
+    } else {
+      console.log('got res: ', response);
     }
   };
 

@@ -48,7 +48,7 @@ RCT_EXPORT_METHOD(getInternal : (NSString *)name params : (NSDictionary *)
                 andParams:params
                completion:^(NSDictionary *res, NSError *error) {
                  if (error) {
-                   reject(@"FlowError", [error localizedDescription], NULL);
+                   reject([error domain], [error localizedDescription], error);
                  } else {
                    resolve(res);
                  }
