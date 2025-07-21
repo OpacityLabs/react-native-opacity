@@ -7,6 +7,20 @@ export class OpacityError extends Error {
     super(message);
     this.name = 'OpacityError';
     this.code = code;
+
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
+
+  toString() {
+    return `${this.name}: [${this.code}] ${this.message}`;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      code: this.code,
+      message: this.message,
+    };
   }
 }
 
