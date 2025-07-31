@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/OpacityLabs/react-native-opacity.git", :tag => "#{s.version}" }
 
   s.source_files = "ios/**/*.{h,m,mm}", "cpp/**/*.{hpp,cpp,c,h}"
-  s.dependency 'OpacityCore', '6.1.5'
+  s.dependency 'OpacityCore', '6.1.6'
 
   s.frameworks = "WebKit", "CoreTelephony", "CoreLocation", "SystemConfiguration"
 
