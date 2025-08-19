@@ -8,12 +8,12 @@
     "start": "react-native start",
     "pods": "cd ios && rm -f Podfile.lock && rm -rf Pods && pod install --repo-update && rm -rf ./ios/.xcode.env.local",
     "build:android": "react-native build-android --extra-params \"--no-daemon --console=plain -PreactNativeArchitectures=arm64-v8a\"",
-    "build:ios": "react-native build-ios --scheme OpacityRN --mode Debug --extra-params \"-sdk iphonesimulator CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ GCC_OPTIMIZATION_LEVEL=0 GCC_PRECOMPILE_PREFIX_HEADER=YES ASSETCATALOG_COMPILER_OPTIMIZATION=time DEBUG_INFORMATION_FORMAT=dwarf COMPILER_INDEX_STORE_ENABLE=NO\"",
+    "build:ios": "react-native build-ios -mode Debug",
     "nuke": "rm -rf node_modules && rm -rf ios/Pods && rm -rf ios/Podfile.lock && rm -rf ios/build && yarn && yarn pods"
   },
   "dependencies": {
-    "react": "18.3.1",
-    "react-native": "0.77.3",
+    "react": "19.1.0",
+    "react-native": "0.81.0",
     "react-native-dotenv": "^3.4.11",
     "react-native-toast-message": "^2.2.1"
   },
@@ -21,14 +21,14 @@
     "@babel/core": "^7.25.2",
     "@babel/preset-env": "^7.25.3",
     "@babel/runtime": "^7.25.0",
-    "@react-native-community/cli": "15.0.1",
-    "@react-native-community/cli-platform-android": "15.0.1",
-    "@react-native-community/cli-platform-ios": "15.0.1",
-    "@react-native/babel-preset": "0.77.0",
-    "@react-native/metro-config": "0.77.0",
-    "@react-native/typescript-config": "0.77.0",
+    "@react-native-community/cli": "18.0.0",
+    "@react-native-community/cli-platform-android": "18.0.0",
+    "@react-native-community/cli-platform-ios": "18.0.0",
+    "@react-native/babel-preset": "0.81.0",
+    "@react-native/metro-config": "0.81.0",
+    "@react-native/typescript-config": "0.81.0",
     "@types/react-native-dotenv": "^0.2.2",
-    "react-native-builder-bob": "^0.35.2"
+    "react-native-builder-bob": "^0.40.13"
   },
   "engines": {
     "node": ">=18"
