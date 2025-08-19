@@ -5,9 +5,7 @@
 RCT_EXPORT_MODULE()
 
 OpacityEnvironment opacityEnvironmentFromDouble(double value) {
-  if (value == 0.0) {
-    return Test;
-  } else if (value == 1.0) {
+  if (value == 1.0) {
     return Local;
   } else if (value == 2.0) {
     return Sandbox;
