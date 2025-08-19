@@ -33,7 +33,6 @@ class OpacityModule(private val reactContext: ReactApplicationContext) :
   ) {
     val environmentEnum =
       when (environment) {
-        0.0 -> OpacityCore.Environment.TEST
         1.0 -> OpacityCore.Environment.LOCAL
         2.0 -> OpacityCore.Environment.STAGING
         3.0 -> OpacityCore.Environment.STAGING
