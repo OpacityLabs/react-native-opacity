@@ -86,10 +86,13 @@ jobs:
           yarn run build:android
 
   build-ios:
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: select xcode version
+        run: sudo xcode-select -s /Applications/Xcode_16.a.app
 
       - name: Setup
         uses: ./.github/actions/setup
