@@ -1,6 +1,6 @@
 # react-native-opacity
 
-Opacity Networks library for React Native.
+Opacity Networks library for React Native. Only new architecture is supported.
 
 ## Install
 
@@ -10,13 +10,13 @@ yarn add @opacity-labs/react-native-opacity
 
 # Expo
 
-If you are using an Expo app, the native configuration changes below have been abstracted into an expo-plugin, just add it to the plugins section in you `app.json`:
+You can automatically configure your app via CNG, add to `app.json`:
 
 ```json
 {
-  // In the plugins sectino add the following
+  ...
   "plugins": [
-    // ...,
+    ...,
     "@opacity-labs/react-native-opacity"
   ]
 }
@@ -26,31 +26,7 @@ If you are using an Expo app, the native configuration changes below have been a
 
 ## iOS
 
-You need to bump your minimum deployment target to iOS 14. On the latest versions of RN this should be the default target, if not you can do it via:
-
-```
-Xcode → Project Explorer → [YOUR TARGET] → General → Deployment Target
-```
-
-Do a `pod install` Module is a Turbo Module, therefore you need to enable the new arch. Again, on the latest RN versions the new architecture should be turned on by default if not run:
-
-```
-cd ios && RCT_ENABLE_NEW_ARCH=1 pod install
-```
-
-Or modify the top of your podfile and do a pod install:
-
-```ruby
-env['RCT_ENABLE_NEW_ARCH'] = '1'
-```
-
-If you are pulling on the latest version the package, sometimes cocoapods refuses to update it's main repo specs. You can force an update via:
-
-```sh
-rm -rf ~/.cocoapods/repos/trunk
-pod repo update
-RCT_ENABLE_NEW_ARCH=1 pod install --repo-update
-```
+Do a pod install after installing the library
 
 ## Android
 
@@ -80,13 +56,13 @@ On your apps `AndroidManifest.xml` add an activity:
 
 # Codegen config
 
-Indenpendtly of Expo or a bare React Native app.l You need to make sure `react-native.config.js` is properly set up for code generation to work:
+Independently of Expo or a bare React Native app. You need to make sure `react-native.config.js` is properly set up for code generation to work:
 
 ```js
 module.exports = {
   project: {
     android: {
-      packageName: 'your.package.name', // must match your android apps package name, take a look into your apps build.gradle
+      packageName: 'your.package.name', // must match your android apps package name
     },
   },
 };
@@ -111,20 +87,12 @@ try {
 }
 
 export async function getUberRiderProfile() {
-  try {
-    let profileResponse = await get('flow:uber_rider:profile');
-    console.log(profileResponse);
-  } catch (e) {
-    console.error(`Could not get profile ${e}`);
+  let { response, error } = await get('flow:uber_rider:profile');
+  if (error) {
+    // handle the error returned by the library
+    console.log(error.code, error.message);
+  } else {
+    console.log(response);
   }
 }
-```
-
-Then somewhere on your app you can just call the functions:
-
-```tsx
-// App.tsx
-import { getUberRiderProfile } from './OpacityInstance';
-
-return <Button onPress={getUberRiderProfile} title="Get Uber Rider Profile" />;
 ```
