@@ -1,0 +1,6 @@
+pre-commit:
+  parallel: true
+  commands:
+    types:
+      glob: '*.{js,ts, jsx, tsx}'
+      run: npx tsc

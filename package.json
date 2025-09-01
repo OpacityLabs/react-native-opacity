@@ -1,0 +1,156 @@
+{
+  "name": "@opacity-labs/react-native-opacity",
+  "version": "0.0.0",
+  "description": "Opacity Networks library for React Native",
+  "source": "./src/index.tsx",
+  "main": "./lib/module/index.js",
+  "types": "./lib/typescript/src/index.d.ts",
+  "exports": {
+    ".": {
+      "source": "./src/index.tsx",
+      "types": "./lib/typescript/src/index.d.ts",
+      "default": "./lib/module/index.js"
+    },
+    "./app.plugin.js": "./app.plugin.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "app.plugin.js",
+    "expo-plugin",
+    "src",
+    "lib",
+    "android",
+    "ios",
+    "cpp",
+    "*.podspec",
+    "react-native.config.js",
+    "!ios/build",
+    "!android/build",
+    "!android/gradle",
+    "!android/gradlew",
+    "!android/gradlew.bat",
+    "!android/local.properties",
+    "!**/__tests__",
+    "!**/__fixtures__",
+    "!**/__mocks__",
+    "!**/.*"
+  ],
+  "scripts": {
+    "example": "yarn workspace example",
+    "test": "jest",
+    "typecheck": "tsc",
+    "prepack": "bob build && yarn build:expo:plugin",
+    "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
+    "prepare": "bob build && yarn build:expo:plugin",
+    "release": "release-it",
+    "build:expo:plugin": "tsc -p ./expo-plugin/tsconfig.json"
+  },
+  "keywords": [
+    "react-native",
+    "ios",
+    "android"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpacityLabs/react-native-opacity.git"
+  },
+  "author": "Oscar Franco <ospfranco@gmail.com> (https://github.com/ospfranco)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/OpacityLabs/react-native-opacity/issues"
+  },
+  "homepage": "https://github.com/OpacityLabs/react-native-opacity#readme",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "devDependencies": {
+    "@evilmartians/lefthook": "^1.5.0",
+    "@expo/config-plugins": "11.0.2",
+    "@react-native-community/cli": "15.0.0-alpha.2",
+    "@react-native/eslint-config": "^0.81.0",
+    "@types/react": "19.0.0",
+    "del-cli": "^5.1.0",
+    "prettier": "^3.0.3",
+    "react": "19.0.0",
+    "react-native": "0.81.0",
+    "react-native-builder-bob": "^0.40.13",
+    "typescript": "^5.8.3"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  },
+  "workspaces": [
+    "example"
+  ],
+  "packageManager": "yarn@3.6.1",
+  "jest": {
+    "preset": "react-native",
+    "modulePathIgnorePatterns": [
+      "<rootDir>/example/node_modules",
+      "<rootDir>/lib/"
+    ]
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "@react-native",
+      "prettier"
+    ],
+    "rules": {
+      "react/react-in-jsx-scope": "off",
+      "prettier/prettier": [
+        "error",
+        {
+          "quoteProps": "consistent",
+          "singleQuote": true,
+          "tabWidth": 2,
+          "trailingComma": "es5",
+          "useTabs": false
+        }
+      ]
+    }
+  },
+  "eslintIgnore": [
+    "node_modules/",
+    "lib/"
+  ],
+  "prettier": {
+    "quoteProps": "consistent",
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5",
+    "useTabs": false
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      [
+        "module",
+        {
+          "esm": true
+        }
+      ],
+      [
+        "typescript",
+        {
+          "project": "tsconfig.build.json"
+        }
+      ]
+    ]
+  },
+  "codegenConfig": {
+    "name": "RNOpacitySpec",
+    "type": "modules",
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "com.opacitylabs.rn"
+    }
+  },
+  "create-react-native-library": {
+    "languages": "kotlin-objc",
+    "type": "turbo-module",
+    "version": "0.52.1"
+  }
+}
