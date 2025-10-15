@@ -3,7 +3,7 @@ PODS:
   - hermes-engine (0.81.1):
     - hermes-engine/Pre-built (= 0.81.1)
   - hermes-engine/Pre-built (0.81.1)
-  - OpacityCore (6.4.1)
+  - OpacityCore (6.5.0)
   - RCTDeprecation (0.81.1)
   - RCTRequired (0.81.1)
   - RCTTypeSafety (0.81.1):
@@ -1285,7 +1285,7 @@ PODS:
     - ReactNativeDependencies
   - react-native-opacity (0.0.0):
     - hermes-engine
-    - OpacityCore (= 6.4.1)
+    - OpacityCore (= 6.5.0)
     - RCTRequired
     - RCTTypeSafety
     - React-Core
@@ -1875,7 +1875,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   FBLazyVector: 8da1272845e10a35c1e661a4c8ba644526c014fb
   hermes-engine: 4f8246b1f6d79f625e0d99472d1f3a71da4d28ca
-  OpacityCore: c3d17dd981c6e23b9f547f588ec0f9a36551e0b2
+  OpacityCore: 39b3342450a2cb9a293327922e3912a0ce9004ab
   RCTDeprecation: 24056820c873bf5115c0441651440bfde2b82d51
   RCTRequired: d0b6e766be3c17896d92059c917d682433ff8a34
   RCTTypeSafety: 1954dcf545fe67e969e11e1b4fe6cf864e1ac632
@@ -1909,7 +1909,7 @@ SPEC CHECKSUMS:
   React-logger: 57463ca0b4e2821e99de5d3e169c73bb44747fa8
   React-Mapbuffer: 1c2d763cab246940480c26f7783fea3158328e6e
   React-microtasksnativemodule: fd8ba0661426ff3b0d75420d9735c06d1267a65e
-  react-native-opacity: d516657addaf23cd8e7d1e777c9f973891111f86
+  react-native-opacity: 7e52713ead2a2e961237fffaa658dd646d87afae
   React-NativeModulesApple: 9d84ce1083672774f99e47db67b72a1754a229f4
   React-oscompat: 8f2893713639e12c7558750a9f7de3f08ac255b0
   React-perflogger: 8b2e23af5d2ad2af3564dc5b39e8f645fe6e213e
