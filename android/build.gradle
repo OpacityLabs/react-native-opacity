@@ -78,5 +78,5 @@ def kotlin_version = getExtOrDefault("kotlinVersion")
 dependencies {
   implementation "com.facebook.react:react-android"
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  api "com.github.OpacityLabs:opacity-android:6.10.11"
+  api "com.github.OpacityLabs:opacity-android:6.10.12"
 }
