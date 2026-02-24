@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   s.source_files = "ios/**/*.{h,m,mm}", "cpp/**/*.{hpp,cpp,c,h}"
   s.private_header_files = "ios/**/*.h"
 
-  s.dependency 'OpacityCore', '6.10.14'
+  s.dependency 'OpacityCore', '6.10.17'
 
   install_modules_dependencies(s)
 end
