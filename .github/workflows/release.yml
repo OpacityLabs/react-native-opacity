@@ -14,10 +14,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup
         uses: ./.github/actions/setup
+      
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Fix permissions on cli
         run: |
@@ -29,9 +35,8 @@ jobs:
           TAG_NAME=${GITHUB_REF#refs/tags/}
           jq --arg version "$TAG_NAME" '.version = $version' package.json > tmp.$$.json && mv tmp.$$.json package.json
 
-      - uses: JS-DevTools/npm-publish@v3
-        with:
-          token: ${{ secrets.NODE_AUTH_TOKEN }}
+      - name: Publish to npm
+        run: npm publish
 
       - name: Create Release
         uses: actions/create-release@v1
