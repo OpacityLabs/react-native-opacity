@@ -8,6 +8,11 @@ export interface Spec extends TurboModule {
     environment: number,
     shouldShowErrorsInWebView: boolean
   ): Promise<void>;
+  initializeOpenTelemetry(
+    openTelemetryEndpoint: string,
+    grafanaInstanceId: string,
+    grafanaApiToken: string
+  ): Promise<void>;
   getInternal(name: string, params?: Object): Promise<Object>;
 }
 

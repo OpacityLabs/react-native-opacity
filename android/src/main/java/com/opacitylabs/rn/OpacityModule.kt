@@ -50,6 +50,24 @@ class OpacityModule(private val reactContext: ReactApplicationContext) :
     }
   }
 
+  override fun initializeOpenTelemetry(
+    openTelemetryEndpoint: String,
+    grafanaInstanceId: String,
+    grafanaApiToken: String,
+    promise: Promise
+  ) {
+    try {
+      val status = OpacityCore.initializeOpenTelemetry(openTelemetryEndpoint, grafanaInstanceId, grafanaApiToken)
+      if (status == 0) {
+        promise.resolve(null)
+      } else {
+        promise.reject("$status", "Failed to initialize OpenTelemetry")
+      }
+    } catch (e: Exception) {
+      promise.reject("Initialization Error", e.message, e)
+    }
+  }
+
   override fun getInternal(name: String, params: ReadableMap?, promise: Promise) {
     CoroutineScope(Dispatchers.IO).launch {
       val res = OpacityCore.get(name, params?.toHashMap())
