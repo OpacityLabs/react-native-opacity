@@ -39,6 +39,27 @@ RCT_EXPORT_METHOD(
   }
 }
 
+RCT_EXPORT_METHOD(initializeOpenTelemetry : (NSString *)
+                       openTelemetryEndpoint andGrafanaInstanceId : (NSString *)
+                           grafanaInstanceId andGrafanaApiToken : (NSString *)
+                               grafanaApiToken resolve : (RCTPromiseResolveBlock)
+                                   resolve reject : (RCTPromiseRejectBlock)reject) {
+
+  NSError *error = nil;
+
+  int status = [OpacityObjCWrapper initializeOpenTelemetry:openTelemetryEndpoint
+                                        andGrafanaInstanceId:grafanaInstanceId
+                                          andGrafanaApiToken:grafanaApiToken
+                                                    andError:&error];
+
+  if (status == 0) {
+    resolve(nil);
+  } else {
+    NSString *message = error ? [error localizedDescription] : @"Unknown error";
+    reject([NSString stringWithFormat:@"%d", status], message, error);
+  }
+}
+
 RCT_EXPORT_METHOD(getInternal : (NSString *)name params : (NSDictionary *)
                       params resolve : (RCTPromiseResolveBlock)
                           resolve reject : (RCTPromiseRejectBlock)reject) {

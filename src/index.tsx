@@ -63,6 +63,28 @@ export async function init({
   }
 }
 
+export async function initializeOpenTelemetry({
+  openTelemetryEndpoint,
+  grafanaInstanceId,
+  grafanaApiToken,
+}: {
+  openTelemetryEndpoint: string;
+  grafanaInstanceId: string;
+  grafanaApiToken: string;
+}): Promise<void> {
+  try {
+    let res = await Opacity.initializeOpenTelemetry(
+      openTelemetryEndpoint,
+      grafanaInstanceId,
+      grafanaApiToken
+    );
+    return res;
+  } catch (e) {
+    console.error('Could not initialize OpenTelemetry', e);
+    throw e;
+  }
+}
+
 /**
  * Main function to get a flow response from Opacity.
  *
