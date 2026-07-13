@@ -45,7 +45,7 @@ RCT_EXPORT_METHOD(initializeOpenTelemetry : (NSString *)
                                grafanaApiToken resolve : (RCTPromiseResolveBlock)
                                    resolve reject : (RCTPromiseRejectBlock)reject) {
 
-  NSError *error;
+  NSError *error = nil;
 
   int status = [OpacityObjCWrapper initializeOpenTelemetry:openTelemetryEndpoint
                                         andGrafanaInstanceId:grafanaInstanceId
@@ -55,8 +55,8 @@ RCT_EXPORT_METHOD(initializeOpenTelemetry : (NSString *)
   if (status == 0) {
     resolve(nil);
   } else {
-    reject([NSString stringWithFormat:@"%d", status],
-           [error localizedDescription], NULL);
+    NSString *message = error ? [error localizedDescription] : @"Unknown error";
+    reject([NSString stringWithFormat:@"%d", status], message, error);
   }
 }
 

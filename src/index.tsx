@@ -81,6 +81,7 @@ export async function initializeOpenTelemetry({
     return res;
   } catch (e) {
     console.error('Could not initialize OpenTelemetry', e);
+    throw e;
   }
 }
 

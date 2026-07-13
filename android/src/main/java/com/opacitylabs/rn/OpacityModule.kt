@@ -64,7 +64,7 @@ class OpacityModule(private val reactContext: ReactApplicationContext) :
         promise.reject("$status", "Failed to initialize OpenTelemetry")
       }
     } catch (e: Exception) {
-      promise.reject("Initialization Error", e.message, e)
+      promise.reject("Initialization Error", e.message ?: "Failed to initialize OpenTelemetry", e)
     }
   }
 
