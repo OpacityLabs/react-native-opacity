@@ -418,9 +418,12 @@ const char *get_ip_address() {
     // Loop through linked list of interfaces
     temp_addr = interfaces;
     while (temp_addr != NULL) {
+      if (temp_addr->ifa_addr == NULL) {
+        temp_addr = temp_addr->ifa_next;
+        continue;
+      }
       // Check if the interface is IPv4 or IPv6
       if (temp_addr->ifa_addr->sa_family == AF_INET) {
-        // Check if the interface is not a loopback address
         if (strcmp(temp_addr->ifa_name, "lo0") != 0) {
           // Convert the IP address from a binary to a string representation
           ipAddress =
