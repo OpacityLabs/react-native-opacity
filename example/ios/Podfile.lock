@@ -3,7 +3,6 @@ PODS:
   - hermes-engine (0.81.1):
     - hermes-engine/Pre-built (= 0.81.1)
   - hermes-engine/Pre-built (0.81.1)
-  - OpacityCore (6.25.2)
   - RCTDeprecation (0.81.1)
   - RCTRequired (0.81.1)
   - RCTTypeSafety (0.81.1):
@@ -1285,7 +1284,6 @@ PODS:
     - ReactNativeDependencies
   - react-native-opacity (0.0.0):
     - hermes-engine
-    - OpacityCore (= 6.25.2)
     - RCTRequired
     - RCTTypeSafety
     - React-Core
@@ -1729,10 +1727,6 @@ DEPENDENCIES:
   - ReactNativeDependencies (from `../node_modules/react-native/third-party-podspecs/ReactNativeDependencies.podspec`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
-SPEC REPOS:
-  trunk:
-    - OpacityCore
-
 EXTERNAL SOURCES:
   FBLazyVector:
     :path: "../node_modules/react-native/Libraries/FBLazyVector"
@@ -1875,7 +1869,6 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   FBLazyVector: 8da1272845e10a35c1e661a4c8ba644526c014fb
   hermes-engine: 4f8246b1f6d79f625e0d99472d1f3a71da4d28ca
-  OpacityCore: 277ae2f106a79155b7a9a7229e6dc388fbbcd1c6
   RCTDeprecation: 24056820c873bf5115c0441651440bfde2b82d51
   RCTRequired: d0b6e766be3c17896d92059c917d682433ff8a34
   RCTTypeSafety: 1954dcf545fe67e969e11e1b4fe6cf864e1ac632
@@ -1909,7 +1902,7 @@ SPEC CHECKSUMS:
   React-logger: a1c9c8dfc56711d06a21109b55908e177113e554
   React-Mapbuffer: bc36232966c55d5b1cbef3b84cb97c4317fa4403
   React-microtasksnativemodule: cbabfedcf6c2984e59d07f9ab553f3d277599b1b
-  react-native-opacity: 471694c09dd63e9437c1736d5557d5dd99f2bbe1
+  react-native-opacity: 21aaf58980a44cffad8b7fa5c410c0a7cd8b4528
   React-NativeModulesApple: 055e2d1417c663e7a26fc0847609f503e626e9e1
   React-oscompat: 8f2893713639e12c7558750a9f7de3f08ac255b0
   React-perflogger: 34b632f94b15e1068f7997e5a68b40a55162ad13
@@ -1945,4 +1938,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 3e01f189e5e3ec3a6c94ea1926dc497ae46cff19
 
-COCOAPODS: 1.16.2
+COCOAPODS: 1.15.2

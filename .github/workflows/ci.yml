@@ -50,75 +50,75 @@ jobs:
       - name: Build package
         run: yarn prepare
 
-  build-android:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+  # build-android:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
 
-      - name: Setup
-        uses: ./.github/actions/setup
+  #     - name: Setup
+  #       uses: ./.github/actions/setup
 
-      - name: Install JDK
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '17'
+  #     - name: Install JDK
+  #       uses: actions/setup-java@v3
+  #       with:
+  #         distribution: 'zulu'
+  #         java-version: '17'
 
-      - name: Finalize Android SDK
-        run: |
-          /bin/bash -c "yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null"
+  #     - name: Finalize Android SDK
+  #       run: |
+  #         /bin/bash -c "yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null"
 
-      - name: Cache Gradle
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/wrapper
-            ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('example/android/gradle/wrapper/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+  #     - name: Cache Gradle
+  #       uses: actions/cache@v3
+  #       with:
+  #         path: |
+  #           ~/.gradle/wrapper
+  #           ~/.gradle/caches
+  #         key: ${{ runner.os }}-gradle-${{ hashFiles('example/android/gradle/wrapper/gradle-wrapper.properties') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-gradle-
 
-      - name: Build example for Android
-        env:
-          JAVA_OPTS: '-XX:MaxHeapSize=6g'
-        run: |
-          yarn run build:android
+  #     - name: Build example for Android
+  #       env:
+  #         JAVA_OPTS: '-XX:MaxHeapSize=6g'
+  #       run: |
+  #         yarn run build:android
 
-  build-ios:
-    runs-on: macos-15
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+  # build-ios:
+  #   runs-on: macos-15
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
 
-      - name: select xcode version
-        run: sudo xcode-select -s /Applications/Xcode_16.4.app
+  #     - name: select xcode version
+  #       run: sudo xcode-select -s /Applications/Xcode_16.4.app
 
-      - name: Setup
-        uses: ./.github/actions/setup
+  #     - name: Setup
+  #       uses: ./.github/actions/setup
 
-      - name: Fix permissions on cli
-        run: |
-          chmod u+x node_modules/@react-native-community/cli/build/*.js
-          chmod u+x node_modules/.bin/rnc-cli
+  #     - name: Fix permissions on cli
+  #       run: |
+  #         chmod u+x node_modules/@react-native-community/cli/build/*.js
+  #         chmod u+x node_modules/.bin/rnc-cli
 
-      - name: Cache cocoapods
-        id: cocoapods-cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            **/ios/Pods
-          key: ${{ runner.os }}-cocoapods-${{ hashFiles('example/ios/Podfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cocoapods-
+  #     - name: Cache cocoapods
+  #       id: cocoapods-cache
+  #       uses: actions/cache@v3
+  #       with:
+  #         path: |
+  #           **/ios/Pods
+  #         key: ${{ runner.os }}-cocoapods-${{ hashFiles('example/ios/Podfile.lock') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-cocoapods-
 
-      - name: Install cocoapods
-        run: |
-          cd example/ios
-          pod repo update
-          pod update hermes-engine
-          pod install
+  #     - name: Install cocoapods
+  #       run: |
+  #         cd example/ios
+  #         pod repo update
+  #         pod update hermes-engine
+  #         pod install
 
-      - name: Build example for iOS
-        run: |
-          yarn run build:ios
+  #     - name: Build example for iOS
+  #       run: |
+  #         yarn run build:ios

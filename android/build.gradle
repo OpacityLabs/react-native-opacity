@@ -1,6 +1,6 @@
 buildscript {
   ext.getExtOrDefault = {name ->
-    return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties['Dupli_' + name]
+    return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties['Opacity_' + name]
   }
 
   repositories {
@@ -12,17 +12,19 @@ buildscript {
     classpath "com.android.tools.build:gradle:8.7.2"
     // noinspection DifferentKotlinGradleVersion
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${getExtOrDefault('kotlinVersion')}"
+    classpath "org.jetbrains.kotlin:kotlin-serialization:${getExtOrDefault('kotlinVersion')}"
   }
 }
 
 
 apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
+apply plugin: "kotlinx-serialization"
 
 apply plugin: "com.facebook.react"
 
 def getExtOrIntegerDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["Dupli_" + name]).toInteger()
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["Opacity_" + name]).toInteger()
 }
 
 
@@ -30,10 +32,19 @@ android {
   namespace "com.opacitylabs.rn"
 
   compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
+  ndkVersion getExtOrDefault("ndkversion")
 
   defaultConfig {
     minSdkVersion getExtOrIntegerDefault("minSdkVersion")
     targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
+    consumerProguardFiles "consumer-rules.pro"
+
+    externalNativeBuild {
+      cmake {
+        cppFlags "-O2 -frtti -fexceptions -Wall -fstack-protector-all"
+        arguments "-DANDROID_STL=c++_shared"
+      }
+    }
   }
 
   buildFeatures {
@@ -56,6 +67,13 @@ android {
     targetCompatibility JavaVersion.VERSION_1_8
   }
 
+  externalNativeBuild {
+    cmake {
+      path file("src/main/cpp/CMakeLists.txt")
+      version "3.22.1"
+    }
+  }
+
   sourceSets {
     main {
       java.srcDirs += [
@@ -70,7 +88,6 @@ repositories {
   mavenCentral()
   google()
   maven { url "https://maven.mozilla.org/maven2/" }
-  maven { url 'https://jitpack.io' }
 }
 
 def kotlin_version = getExtOrDefault("kotlinVersion")
@@ -78,5 +95,10 @@ def kotlin_version = getExtOrDefault("kotlinVersion")
 dependencies {
   implementation "com.facebook.react:react-android"
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  api "com.github.OpacityLabs:opacity-android:6.25.2"
+  implementation "androidx.core:core-ktx:1.13.1"
+  implementation "androidx.appcompat:appcompat:1.7.0"
+  implementation "androidx.webkit:webkit:1.12.1"
+  implementation "androidx.security:security-crypto:1.1.0-alpha06"
+  implementation "androidx.localbroadcastmanager:localbroadcastmanager:1.1.0"
+  implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0"
 }

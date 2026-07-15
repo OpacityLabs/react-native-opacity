@@ -16,7 +16,11 @@ Pod::Spec.new do |s|
   s.source_files = "ios/**/*.{h,m,mm}", "cpp/**/*.{hpp,cpp,c,h}"
   s.private_header_files = "ios/**/*.h"
 
-  s.dependency 'OpacityCore', '6.25.2'
+  s.frameworks = "WebKit", "CoreTelephony", "CoreLocation", "SystemConfiguration"
+  s.vendored_frameworks = "ios/sdk.xcframework"
+  s.pod_target_xcconfig = {
+    "OTHER_LDFLAGS" => "-framework sdk",
+  }
 
   install_modules_dependencies(s)
 end
