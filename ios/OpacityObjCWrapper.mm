@@ -5,14 +5,14 @@
 NSError *parseOpacityError(NSString *jsonString) {
   if (jsonString == nil || [jsonString length] == 0) {
     return [NSError
-        errorWithDomain:@"OpacitySDKUnkownError"
+        errorWithDomain:@"OpacitySDKUnknownError"
                    code:1001
                userInfo:@{NSLocalizedDescriptionKey : @"Empty error message"}];
   }
 
   NSData *data = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
   if (data == nil) {
-    return [NSError errorWithDomain:@"OpacitySDKUnkownError"
+    return [NSError errorWithDomain:@"OpacitySDKUnknownError"
                                code:1001
                            userInfo:@{NSLocalizedDescriptionKey : jsonString}];
   }
@@ -22,7 +22,7 @@ NSError *parseOpacityError(NSString *jsonString) {
                                                        options:0
                                                          error:&parsingError];
   if (parsingError != nil || json == nil) {
-    return [NSError errorWithDomain:@"OpacitySDKUnkownError"
+    return [NSError errorWithDomain:@"OpacitySDKUnknownError"
                                code:1001
                            userInfo:@{NSLocalizedDescriptionKey : jsonString}];
   }
@@ -52,10 +52,12 @@ NSError *parseOpacityError(NSString *jsonString) {
     BOOL success = [bundle load];
     if (!success) {
       NSString *errorMessage = @"Failed to load framework";
-      *error =
-          [NSError errorWithDomain:@"OpacitySDKDylibError"
-                              code:1002
-                          userInfo:@{NSLocalizedDescriptionKey : errorMessage}];
+      if (error) {
+        *error = [NSError
+            errorWithDomain:@"OpacitySDKDylibError"
+                       code:1002
+                   userInfo:@{NSLocalizedDescriptionKey : errorMessage}];
+      }
       return -1;
     }
   }
@@ -80,26 +82,32 @@ NSError *parseOpacityError(NSString *jsonString) {
                                           should_show_errors_in_webview, &err);
   if (status != opacity_core::OPACITY_OK && err != nullptr) {
     NSString *errorMessage = [NSString stringWithUTF8String:err];
-    *error = parseOpacityError(errorMessage);
+    if (error) {
+      *error = parseOpacityError(errorMessage);
+    }
     opacity_core::opacity_free_string(err);
   }
 
   return status;
 }
 
-+ (int)initializeOpenTelemetry:(NSString *)openTelemetryEndpoint andGrafanaInstanceId:(NSString *)grafanaInstanceId andGrafanaApiToken:(NSString *)grafanaApiToken andError:(NSError *__autoreleasing *)error {
++ (int)initializeOpenTelemetry:(NSString *)openTelemetryEndpoint
+          andGrafanaInstanceId:(NSString *)grafanaInstanceId
+            andGrafanaApiToken:(NSString *)grafanaApiToken
+                      andError:(NSError *__autoreleasing *)error {
   char *err;
-  int status = opacity_core::opacity_initialize_open_telemetry([openTelemetryEndpoint UTF8String],
-                                                  [grafanaInstanceId UTF8String],
-                                                  [grafanaApiToken UTF8String],
-                                                  &err);
-  
+  int status = opacity_core::opacity_initialize_open_telemetry(
+      [openTelemetryEndpoint UTF8String], [grafanaInstanceId UTF8String],
+      [grafanaApiToken UTF8String], &err);
+
   if (status != opacity_core::OPACITY_OK && err != nullptr) {
     NSString *errorMessage = [NSString stringWithUTF8String:err];
-    *error = parseOpacityError(errorMessage);
+    if (error) {
+      *error = parseOpacityError(errorMessage);
+    }
     opacity_core::opacity_free_string(err);
   }
-  
+
   return status;
 }
 
@@ -127,8 +135,9 @@ NSError *parseOpacityError(NSString *jsonString) {
 
         dispatch_async(dispatch_get_main_queue(), ^{
           completion(nil, error);
-          return;
         });
+
+        return;
       }
 
       paramsJSON = [[NSString alloc] initWithData:jsonData

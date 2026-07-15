@@ -15,6 +15,23 @@ UINavigationController *navController;
 NSString *userAgent;
 NSMutableArray<NSHTTPCookie *> *pendingCookies;
 
+// Rust reads the const char* returned across the FFI boundary synchronously,
+// immediately after the call, and never frees it. These statics keep the
+// backing NSString retained past the function's return so the UTF8String
+// pointer isn't dangling by the time Rust reads it (ARC would otherwise
+// deallocate a purely local NSString as soon as it goes out of scope).
+static NSString *evalJsResultHolder;
+static NSString *cookiesForDomainJsonHolder;
+static NSString *cookiesForCurrentUrlJsonHolder;
+static NSString *deviceCodenameHolder;
+static NSString *carrierNameHolder;
+static NSString *carrierMccHolder;
+static NSString *carrierMncHolder;
+static NSString *deviceModelHolder;
+static NSString *osNameHolder;
+static NSString *osVersionHolder;
+static NSString *deviceLocaleHolder;
+
 UIViewController *topMostViewController() {
   // Fetch the key window's root view controller
   UIWindow *keyWindow = [UIApplication sharedApplication].windows.firstObject;
@@ -142,20 +159,21 @@ void ios_webview_change_url(const char *url) {
 
 const char *ios_eval_js(const char *js, double timeout_in_seconds) {
   if (modalWebVC == nil) {
-    return strdup("{\"error\":\"browser not open\"}");
+    return "{\"error\":\"browser not open\"}";
   }
 
   NSString *jsString = [NSString stringWithUTF8String:js];
   if (jsString == nil) {
-    return strdup("{\"error\":\"invalid js string\"}");
+    return "{\"error\":\"invalid js string\"}";
   }
 
   NSString *result = [modalWebVC evalJs:jsString timeout:timeout_in_seconds];
   if (result == nil) {
-    return strdup("{\"error\":\"nil result\"}");
+    return "{\"error\":\"nil result\"}";
   }
 
-  return strdup([result UTF8String]);
+  evalJsResultHolder = result;
+  return [evalJsResultHolder UTF8String];
 }
 
 const char *ios_get_browser_cookies_for_domain(const char *domain) {
@@ -176,9 +194,9 @@ const char *ios_get_browser_cookies_for_domain(const char *domain) {
   }
 
   // Convert JSON data to C string and return
-  NSString *jsonString = [[NSString alloc] initWithData:jsonData
-                                               encoding:NSUTF8StringEncoding];
-  return [jsonString UTF8String];
+  cookiesForDomainJsonHolder = [[NSString alloc] initWithData:jsonData
+                                                      encoding:NSUTF8StringEncoding];
+  return [cookiesForDomainJsonHolder UTF8String];
 }
 
 const char *ios_get_browser_cookies_for_current_url() {
@@ -199,9 +217,9 @@ const char *ios_get_browser_cookies_for_current_url() {
   }
 
   // Convert JSON data to C string and return
-  NSString *jsonString = [[NSString alloc] initWithData:jsonData
-                                               encoding:NSUTF8StringEncoding];
-  return [jsonString UTF8String];
+  cookiesForCurrentUrlJsonHolder = [[NSString alloc] initWithData:jsonData
+                                                          encoding:NSUTF8StringEncoding];
+  return [cookiesForCurrentUrlJsonHolder UTF8String];
 }
 
 double get_battery_level() {
@@ -240,9 +258,8 @@ const char *get_carrier_name() {
   NSDictionary<NSString *, CTCarrier *> *carriers =
       [networkInfo serviceSubscriberCellularProviders];
   CTCarrier *carrier = carriers.allValues.firstObject;
-  NSString *carrierName = [carrier carrierName];
-  const char *name = [carrierName UTF8String];
-  return name;
+  carrierNameHolder = [carrier carrierName];
+  return [carrierNameHolder UTF8String];
 }
 
 const char *get_carrier_mcc() {
@@ -250,9 +267,8 @@ const char *get_carrier_mcc() {
   NSDictionary<NSString *, CTCarrier *> *carriers =
       [networkInfo serviceSubscriberCellularProviders];
   CTCarrier *carrier = carriers.allValues.firstObject;
-  NSString *mcc = [carrier mobileCountryCode];
-  const char *mccCString = [mcc UTF8String];
-  return mccCString;
+  carrierMccHolder = [carrier mobileCountryCode];
+  return [carrierMccHolder UTF8String];
 }
 
 const char *get_carrier_mnc() {
@@ -260,9 +276,8 @@ const char *get_carrier_mnc() {
   NSDictionary<NSString *, CTCarrier *> *carriers =
       [networkInfo serviceSubscriberCellularProviders];
   CTCarrier *carrier = carriers.allValues.firstObject;
-  NSString *mnc = [carrier mobileNetworkCode];
-  const char *mncCString = [mnc UTF8String];
-  return mncCString;
+  carrierMncHolder = [carrier mobileNetworkCode];
+  return [carrierMncHolder UTF8String];
 }
 
 double get_course() {
@@ -303,27 +318,24 @@ double get_longitude() {
 const char *get_device_model() {
   struct utsname systemInfo;
   uname(&systemInfo);
-  NSString *deviceModel = [NSString stringWithCString:systemInfo.machine
-                                             encoding:NSUTF8StringEncoding];
-  const char *model = [deviceModel UTF8String];
-  return model;
+  deviceModelHolder = [NSString stringWithCString:systemInfo.machine
+                                          encoding:NSUTF8StringEncoding];
+  return [deviceModelHolder UTF8String];
 }
 
 const char *get_os_name() {
-  NSString *osName = [UIDevice currentDevice].systemName;
-  const char *name = [osName UTF8String];
-  return name;
+  osNameHolder = [UIDevice currentDevice].systemName;
+  return [osNameHolder UTF8String];
 }
 
 const char *get_os_version() {
-  NSString *osVersion = [UIDevice currentDevice].systemVersion;
-  const char *version = [osVersion UTF8String];
-  return version;
+  osVersionHolder = [UIDevice currentDevice].systemVersion;
+  return [osVersionHolder UTF8String];
 }
 
 const char *get_device_locale() {
-  NSString *localeIdentifier = [[NSLocale currentLocale] localeIdentifier];
-  const char *locale = [localeIdentifier UTF8String];
+  deviceLocaleHolder = [[NSLocale currentLocale] localeIdentifier];
+  const char *locale = [deviceLocaleHolder UTF8String];
   return locale;
 }
 
@@ -358,16 +370,16 @@ const char *get_device_cpu() {
 #else
   static const char *cpu_arch = "unknown";
 #endif
-  return strdup(cpu_arch);
+  return cpu_arch;
 }
 
 const char *get_device_codename() {
   struct utsname systemInfo;
   uname(&systemInfo);
 
-  NSString *codename = [NSString stringWithCString:systemInfo.machine
-                                          encoding:NSUTF8StringEncoding];
-  return strdup([codename UTF8String]);
+  deviceCodenameHolder = [NSString stringWithCString:systemInfo.machine
+                                             encoding:NSUTF8StringEncoding];
+  return [deviceCodenameHolder UTF8String];
 }
 
 bool is_emulator() {
