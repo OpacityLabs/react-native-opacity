@@ -83,6 +83,6 @@ android/generated
 example/.env
 
 # Rust binaries
-android/src/jniLibs
+android/src/main/jniLibs
 ios/*.xcframework
 example/android/.kotlin
