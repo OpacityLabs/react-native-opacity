@@ -258,7 +258,7 @@ const char *get_carrier_name() {
   NSDictionary<NSString *, CTCarrier *> *carriers =
       [networkInfo serviceSubscriberCellularProviders];
   CTCarrier *carrier = carriers.allValues.firstObject;
-  carrierNameHolder = [carrier carrierName];
+  carrierNameHolder = [carrier carrierName] ?: @"";
   return [carrierNameHolder UTF8String];
 }
 
