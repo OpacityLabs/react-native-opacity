@@ -12,6 +12,26 @@
 JavaVM *java_vm;
 jobject java_object;
 
+// Rust reads the const char* returned across the FFI boundary synchronously,
+// immediately after the call, and never frees it. These statics keep the
+// backing buffer alive past the function's return (and reused/overwritten,
+// rather than newly allocated, on every call) so we don't leak memory on
+// every single call while still returning a pointer that's valid for Rust
+// to read immediately.
+static std::string os_version_holder;
+static std::string device_manufacturer_holder;
+static std::string device_model_holder;
+static std::string device_locale_holder;
+static std::string device_cpu_holder;
+static std::string device_codename_holder;
+static std::string bootloader_holder;
+static std::string radio_holder;
+static std::string build_time_holder;
+static std::string cookies_for_current_url_holder;
+static std::string cookies_for_domain_holder;
+static std::string eval_js_result_holder;
+static std::string ip_address_holder;
+
 void DeferThreadDetach(JNIEnv *env) {
   static pthread_key_t thread_key;
 
@@ -20,17 +40,17 @@ void DeferThreadDetach(JNIEnv *env) {
   // This is only done once, across all threads, and the value
   // associated with the key for any given thread will initially
   // be NULL.
-  // static auto run_once = [] {
-  //   const auto err = pthread_key_create(&thread_key, [](void *ts_env) {
-  //     if (ts_env) {
-  //       java_vm->DetachCurrentThread();
-  //     }
-  //   });
-  //   if (err) {
-  //     // Failed to create TSD key. Throw an exception if you want to.
-  //   }
-  //   return 0;
-  // }();
+  [[maybe_unused]] static auto run_once = [] {
+    const auto err = pthread_key_create(&thread_key, [](void *ts_env) {
+      if (ts_env) {
+        java_vm->DetachCurrentThread();
+      }
+    });
+    if (err) {
+      // Failed to create TSD key. Throw an exception if you want to.
+    }
+    return 0;
+  }();
 
   // For the callback to actually be executed when a thread exits
   // we need to associate a non-NULL value with the key on that thread.
@@ -115,8 +135,15 @@ extern "C" const char *secure_get(const char *key) {
     return nullptr;
   }
 
+  // Rust's securely_get() (sdk/src/secure_storage/android.rs) takes ownership
+  // of this pointer via CString::from_raw and frees it when done, so unlike
+  // the accessors below it must be a malloc-compatible allocation (strdup),
+  // not a pointer into a static/reused buffer.
   const char *val_str = env->GetStringUTFChars(res, nullptr);
-  return val_str;
+  char *result = strdup(val_str);
+  env->ReleaseStringUTFChars(res, val_str);
+  env->DeleteLocalRef(res);
+  return result;
 }
 
 extern "C" void android_prepare_request(const char *url) {
@@ -215,15 +242,8 @@ extern "C" const char *get_ip_address() {
     freeifaddrs(ifAddrStruct);
   }
 
-  // Allocate memory for the string and copy its content
-  char *result = new char[ipAddress.size() + 1];
-  std::strcpy(result, ipAddress.c_str());
-
-  // TODO this will leak! The problem is on iOS inet_ntoa is used which returns
-  // a static memory address while there on android we need to manage the memory
-  // ourselves :( Need to solve this later by creating an android_free_string
-  // function that can be called from Rust once the contents have been copied
-  return result; // Caller must free this memory
+  ip_address_holder = ipAddress;
+  return ip_address_holder.c_str();
 }
 
 extern "C" bool android_is_app_foregrounded() {
@@ -245,7 +265,10 @@ extern "C" const char *android_get_os_version() {
   }
 
   const char *val_str = env->GetStringUTFChars(res, nullptr);
-  return val_str;
+  os_version_holder = val_str;
+  env->ReleaseStringUTFChars(res, val_str);
+  env->DeleteLocalRef(res);
+  return os_version_holder.c_str();
 }
 
 extern "C" const char *android_get_device_manufacturer() {
@@ -260,7 +283,10 @@ extern "C" const char *android_get_device_manufacturer() {
   }
 
   const char *val_str = env->GetStringUTFChars(res, nullptr);
-  return val_str;
+  device_manufacturer_holder = val_str;
+  env->ReleaseStringUTFChars(res, val_str);
+  env->DeleteLocalRef(res);
+  return device_manufacturer_holder.c_str();
 }
 
 extern "C" const char *android_get_device_model() {
@@ -275,7 +301,10 @@ extern "C" const char *android_get_device_model() {
   }
 
   const char *val_str = env->GetStringUTFChars(res, nullptr);
-  return val_str;
+  device_model_holder = val_str;
+  env->ReleaseStringUTFChars(res, val_str);
+  env->DeleteLocalRef(res);
+  return device_model_holder.c_str();
 }
 
 extern "C" const char *android_get_device_locale() {
@@ -290,7 +319,10 @@ extern "C" const char *android_get_device_locale() {
   }
 
   const char *val_str = env->GetStringUTFChars(res, nullptr);
-  return val_str;
+  device_locale_holder = val_str;
+  env->ReleaseStringUTFChars(res, val_str);
+  env->DeleteLocalRef(res);
+  return device_locale_holder.c_str();
 }
 
 extern "C" int android_get_sdk_version() {
@@ -335,13 +367,13 @@ extern "C" const char *android_get_device_cpu() {
       env->GetMethodID(jOpacityCore, "getDeviceCpu", "()Ljava/lang/String;");
   auto jCpu = (jstring)env->CallObjectMethod(java_object, method);
   if (jCpu == nullptr) {
-    return strdup("");
+    return "";
   }
   const char *cpu = env->GetStringUTFChars(jCpu, nullptr);
-  char *result = strdup(cpu);
+  device_cpu_holder = cpu;
   env->ReleaseStringUTFChars(jCpu, cpu);
   env->DeleteLocalRef(jCpu);
-  return result;
+  return device_cpu_holder.c_str();
 }
 
 extern "C" const char *android_get_device_codename() {
@@ -351,13 +383,13 @@ extern "C" const char *android_get_device_codename() {
                                       "()Ljava/lang/String;");
   auto jCodename = (jstring)env->CallObjectMethod(java_object, method);
   if (jCodename == nullptr) {
-    return strdup("");
+    return "";
   }
   const char *codename = env->GetStringUTFChars(jCodename, nullptr);
-  char *result = strdup(codename);
+  device_codename_holder = codename;
   env->ReleaseStringUTFChars(jCodename, codename);
   env->DeleteLocalRef(jCodename);
-  return result;
+  return device_codename_holder.c_str();
 }
 
 extern "C" const char *android_get_bootloader() {
@@ -367,13 +399,13 @@ extern "C" const char *android_get_bootloader() {
                                       "()Ljava/lang/String;");
   auto jBootloader = (jstring)env->CallObjectMethod(java_object, method);
   if (jBootloader == nullptr) {
-    return strdup("");
+    return "";
   }
   const char *bootloader = env->GetStringUTFChars(jBootloader, nullptr);
-  char *result = strdup(bootloader);
+  bootloader_holder = bootloader;
   env->ReleaseStringUTFChars(jBootloader, bootloader);
   env->DeleteLocalRef(jBootloader);
-  return result;
+  return bootloader_holder.c_str();
 }
 
 extern "C" const char *android_get_radio() {
@@ -383,13 +415,13 @@ extern "C" const char *android_get_radio() {
                                       "()Ljava/lang/String;");
   auto jRadio = (jstring)env->CallObjectMethod(java_object, method);
   if (jRadio == nullptr) {
-    return strdup("");
+    return "";
   }
   const char *radio = env->GetStringUTFChars(jRadio, nullptr);
-  char *result = strdup(radio);
+  radio_holder = radio;
   env->ReleaseStringUTFChars(jRadio, radio);
   env->DeleteLocalRef(jRadio);
-  return result;
+  return radio_holder.c_str();
 }
 
 extern "C" const char *android_get_build_time() {
@@ -399,13 +431,13 @@ extern "C" const char *android_get_build_time() {
                                       "()Ljava/lang/String;");
   auto jBuildTime = (jstring)env->CallObjectMethod(java_object, method);
   if (jBuildTime == nullptr) {
-    return strdup("");
+    return "";
   }
   const char *buildTime = env->GetStringUTFChars(jBuildTime, nullptr);
-  char *result = strdup(buildTime);
+  build_time_holder = buildTime;
   env->ReleaseStringUTFChars(jBuildTime, buildTime);
   env->DeleteLocalRef(jBuildTime);
-  return result;
+  return build_time_holder.c_str();
 }
 
 extern "C" void android_close_webview() {
@@ -434,7 +466,10 @@ extern "C" const char *android_get_browser_cookies_for_current_url() {
   }
 
   const char *val_str = env->GetStringUTFChars(res, nullptr);
-  return val_str;
+  cookies_for_current_url_holder = val_str;
+  env->ReleaseStringUTFChars(res, val_str);
+  env->DeleteLocalRef(res);
+  return cookies_for_current_url_holder.c_str();
 }
 
 extern "C" const char *android_eval_js(const char *js,
@@ -449,13 +484,13 @@ extern "C" const char *android_eval_js(const char *js,
       (jstring)env->CallObjectMethod(java_object, method, jjs, timeout_ms);
   env->DeleteLocalRef(jjs);
   if (result == nullptr) {
-    return strdup("{\"result\":null}");
+    return "{\"result\":null}";
   }
   const char *str = env->GetStringUTFChars(result, nullptr);
-  char *copy = strdup(str);
+  eval_js_result_holder = str;
   env->ReleaseStringUTFChars(result, str);
   env->DeleteLocalRef(result);
-  return copy;
+  return eval_js_result_holder.c_str();
 }
 
 extern "C" const char *
@@ -468,12 +503,15 @@ android_get_browser_cookies_for_domain(const char *domain) {
                        "(Ljava/lang/String;)Ljava/lang/String;");
   jstring jdomain = env->NewStringUTF(domain);
   auto res = (jstring)env->CallObjectMethod(java_object, method, jdomain);
+  env->DeleteLocalRef(jdomain);
   if (res == nullptr) {
     return nullptr;
   }
   const char *val_str = env->GetStringUTFChars(res, nullptr);
-  //    opacity_core::free_string(domain); // Free the domain string
-  return val_str; // Caller must free this memory
+  cookies_for_domain_holder = val_str;
+  env->ReleaseStringUTFChars(res, val_str);
+  env->DeleteLocalRef(res);
+  return cookies_for_domain_holder.c_str();
 }
 
 extern "C" JNIEXPORT jint JNICALL
@@ -486,6 +524,7 @@ Java_com_opacitylabs_opacitycore_OpacityCore_init(
   int result = opacity_core::opacity_init(api_key_str, dry_run,
                                   static_cast<int>(environment_enum),
                                   show_errors_in_webview, &err);
+  env->ReleaseStringUTFChars(api_key, api_key_str);
   if (result != opacity_core::OPACITY_OK) {
     jclass exceptionClass = env->FindClass("java/lang/Exception");
     env->ThrowNew(exceptionClass, err);
@@ -513,6 +552,10 @@ Java_com_opacitylabs_opacitycore_OpacityCore_nativeInitializeOpenTelemetry(
           grafana_instance_id,
           grafana_api_token, &err);
 
+  env->ReleaseStringUTFChars(j_open_telemetry_endpoint, open_telemetry_endpoint);
+  env->ReleaseStringUTFChars(j_grafana_instance_id, grafana_instance_id);
+  env->ReleaseStringUTFChars(j_grafana_api_token, grafana_api_token);
+
   if (result != opacity_core::OPACITY_OK) {
     jclass exceptionClass = env->FindClass("java/lang/Exception");
     env->ThrowNew(exceptionClass, err);
@@ -526,6 +569,7 @@ Java_com_opacitylabs_opacitycore_OpacityCore_emitWebviewEvent(
     JNIEnv *env, jobject thiz, jstring event_json) {
   const char *json = env->GetStringUTFChars(event_json, nullptr);
   opacity_core::emit_webview_event(json);
+  env->ReleaseStringUTFChars(event_json, json);
 }
 
 jobject createOpacityResponse(JNIEnv *env, int status, char *res, char *err) {
@@ -564,6 +608,10 @@ Java_com_opacitylabs_opacitycore_OpacityCore_getNative(JNIEnv *env,
   const char *params_str =
       params != nullptr ? env->GetStringUTFChars(params, nullptr) : nullptr;
   int status = opacity_core::opacity_get(name_str, params_str, &res, &err);
+  env->ReleaseStringUTFChars(name, name_str);
+  if (params_str != nullptr) {
+    env->ReleaseStringUTFChars(params, params_str);
+  }
   return createOpacityResponse(env, status, res, err);
 }
 
