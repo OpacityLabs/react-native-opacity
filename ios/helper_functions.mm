@@ -276,7 +276,7 @@ const char *get_carrier_mnc() {
   NSDictionary<NSString *, CTCarrier *> *carriers =
       [networkInfo serviceSubscriberCellularProviders];
   CTCarrier *carrier = carriers.allValues.firstObject;
-  carrierMncHolder = [carrier mobileNetworkCode];
+  carrierMncHolder = [carrier mobileNetworkCode] ?: @"";
   return [carrierMncHolder UTF8String];
 }
 
