@@ -27,10 +27,12 @@ NSError *parseOpacityError(NSString *jsonString) {
                            userInfo:@{NSLocalizedDescriptionKey : jsonString}];
   }
 
-  NSString *code = json[@"code"];
-  NSString *desc = json[@"description"];
-  // We are not using this field for now
-  // NSString *translation = json[@"translation_key"];
+  id codeValue = json[@"code"];
+  id descValue = json[@"description"];
+  NSString *code = [codeValue isKindOfClass:[NSString class]] ? (NSString *)codeValue
+                                                         : @"OpacitySDKUnknownError";
+  NSString *desc = [descValue isKindOfClass:[NSString class]] ? (NSString *)descValue
+                                                             : jsonString;
 
   return [NSError errorWithDomain:code
                              code:1001
