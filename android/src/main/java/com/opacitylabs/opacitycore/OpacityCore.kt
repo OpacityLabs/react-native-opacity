@@ -275,14 +275,40 @@ object OpacityCore {
     }
 
     @JvmStatic
-    suspend fun get(name: String, params: Map<String, Any?>?): Result<Map<String, Any?>> {
+    suspend fun get(
+        name: String,
+        params: Map<String, Any?>?
+    ): Result<Map<String, Any?>> {
+        return runGet(name, params, null, null)
+    }
+
+    /**
+     * Runs the flow joined to the caller's W3C trace. [traceparent] is required;
+     * [tracestate] is optional (W3C allows it to be absent).
+     */
+    @JvmStatic
+    suspend fun getWithContext(
+        name: String,
+        params: Map<String, Any?>?,
+        traceparent: String,
+        tracestate: String? = null
+    ): Result<Map<String, Any?>> {
+        return runGet(name, params, traceparent, tracestate)
+    }
+
+    private suspend fun runGet(
+        name: String,
+        params: Map<String, Any?>?,
+        traceparent: String?,
+        tracestate: String?
+    ): Result<Map<String, Any?>> {
         return withContext(Dispatchers.IO) {
             val paramsString = params?.let {
                 val jsonElement = mapToJsonElement(it)
                 Json.encodeToString(jsonElement)
             }
 
-            val res = getNative(name, paramsString)
+            val res = getNative(name, paramsString, traceparent, tracestate)
             if (res.status != 0) {
                 return@withContext Result.failure(parseOpacityError(res.err))
             }
@@ -305,7 +331,12 @@ object OpacityCore {
 
     private external fun nativeInitializeOpenTelemetry(openTelemetryEndpoint: String, grafanaInstanceId: String, grafanaApiToken: String): Int
 
-    private external fun getNative(name: String, params: String?): OpacityResponse
+    private external fun getNative(
+        name: String,
+        params: String?,
+        traceparent: String?,
+        tracestate: String?
+    ): OpacityResponse
     external fun getSdkVersions(): String
     external fun emitWebviewEvent(eventJson: String)
     external fun isBrowserOverlayEnabled(): Boolean

@@ -178,6 +178,17 @@ int32_t opacity_init(const char *api_key_str,
 
 int32_t opacity_get(const char *name, const char *params, char **res_ptr, char **err_ptr);
 
+/**
+ * Like [`opacity_get`], but joins the caller's W3C trace: the flow's root span
+ * is parented to the supplied `traceparent`. `tracestate` is optional
+ */
+int32_t opacity_get_with_context(const char *name,
+                                 const char *params,
+                                 const char *traceparent,
+                                 const char *tracestate,
+                                 char **res_ptr,
+                                 char **err_ptr);
+
 void opacity_free_string(char *ptr);
 
 void emit_webview_event(const char *payload);

@@ -116,6 +116,33 @@ NSError *parseOpacityError(NSString *jsonString) {
 + (void)get:(NSString *)name
      andParams:(NSDictionary *)params
     completion:(void (^)(NSDictionary *res, NSError *error))completion {
+  [self runGet:name
+        andParams:params
+    andTraceparent:nil
+     andTracestate:nil
+       completion:completion];
+}
+
++ (void)getWithContext:(NSString *)name
+             andParams:(NSDictionary *)params
+        andTraceparent:(NSString *)traceparent
+         andTracestate:(NSString *)tracestate
+            completion:(void (^)(NSDictionary *res, NSError *error))completion {
+  [self runGet:name
+        andParams:params
+    andTraceparent:traceparent
+     andTracestate:tracestate
+       completion:completion];
+}
+
+// Shared implementation. A nil `traceparent` runs the plain `opacity_get`
+// (standalone per-flow trace); a non-nil one runs `opacity_get_with_context` to
+// join the caller's trace. `tracestate` is optional even in the joined case.
++ (void)runGet:(NSString *)name
+        andParams:(NSDictionary *)params
+    andTraceparent:(NSString *)traceparent
+     andTracestate:(NSString *)tracestate
+       completion:(void (^)(NSDictionary *res, NSError *error))completion {
   NSThread *thread = [[NSThread alloc] initWithBlock:^{
     char *res, *err;
     NSError *error = nil;
@@ -146,9 +173,17 @@ NSError *parseOpacityError(NSString *jsonString) {
                                          encoding:NSUTF8StringEncoding];
     }
 
-    int status = opacity_core::opacity_get(
-        [name UTF8String], paramsJSON ? [paramsJSON UTF8String] : nullptr, &res,
-        &err);
+    const char *name_str = [name UTF8String];
+    const char *params_str = paramsJSON ? [paramsJSON UTF8String] : nullptr;
+
+    int status;
+    if (traceparent) {
+      status = opacity_core::opacity_get_with_context(
+          name_str, params_str, [traceparent UTF8String],
+          tracestate ? [tracestate UTF8String] : nullptr, &res, &err);
+    } else {
+      status = opacity_core::opacity_get(name_str, params_str, &res, &err);
+    }
 
     if (status != opacity_core::OPACITY_OK) {
       NSString *error_str = [NSString stringWithUTF8String:err];

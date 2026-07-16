@@ -39,9 +39,14 @@ RCT_EXPORT_METHOD(
   }
 }
 
+// Argument labels must match the selector codegen emits from the TurboModule
+// spec -- `@selector(initializeOpenTelemetry:grafanaInstanceId:grafanaApiToken:
+// resolve:reject:)`. An `and`-prefixed label builds a different selector, and
+// the mismatch only surfaces as an unrecognized-selector crash when JS actually
+// calls the method.
 RCT_EXPORT_METHOD(initializeOpenTelemetry : (NSString *)
-                       openTelemetryEndpoint andGrafanaInstanceId : (NSString *)
-                           grafanaInstanceId andGrafanaApiToken : (NSString *)
+                       openTelemetryEndpoint grafanaInstanceId : (NSString *)
+                           grafanaInstanceId grafanaApiToken : (NSString *)
                                grafanaApiToken resolve : (RCTPromiseResolveBlock)
                                    resolve reject : (RCTPromiseRejectBlock)reject) {
 
@@ -72,6 +77,24 @@ RCT_EXPORT_METHOD(getInternal : (NSString *)name params : (NSDictionary *)
                    resolve(res);
                  }
                }];
+}
+
+RCT_EXPORT_METHOD(getInternalWithContext : (NSString *)name traceparent : (
+    NSString *)traceparent params : (NSDictionary *)params tracestate : (
+    NSString *)tracestate resolve : (RCTPromiseResolveBlock)
+                      resolve reject : (RCTPromiseRejectBlock)reject) {
+  [OpacityObjCWrapper getWithContext:name
+                           andParams:params
+                      andTraceparent:traceparent
+                       andTracestate:tracestate
+                          completion:^(NSDictionary *res, NSError *error) {
+                            if (error) {
+                              reject([error domain],
+                                     [error localizedDescription], error);
+                            } else {
+                              resolve(res);
+                            }
+                          }];
 }
 
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:

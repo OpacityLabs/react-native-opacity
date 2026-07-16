@@ -103,8 +103,38 @@ export async function get(
   name: string,
   params?: Record<string, any>
 ): Promise<{ response?: WorkflowResponse; error?: OpacityError }> {
+  return toResult(() => NativeOpacity.getInternal(name, params));
+}
+
+/**
+ * Same as {@link get}, but joins the flow to the caller's W3C trace: the flow's
+ * root span is parented to `traceparent` instead of starting a standalone trace.
+ *
+ * Use this when the flow is one step of a larger operation you're already
+ * tracing, so the flow's spans show up under that trace rather than detached.
+ *
+ * @param name name of the flow to execute e.g. "github:profile"
+ * @param params optional parameters to pass to the flow, check the flow documentation for available parameters
+ * @param traceparent a valid W3C traceparent to parent the flow's root span to
+ * @param tracestate optional W3C tracestate; W3C allows it to be absent
+ * @returns WorkflowResponse containing the JSON response from the flow, and optionally a signature and hash
+ */
+export async function getWithContext(
+  name: string,
+  params: Record<string, any> | undefined,
+  traceparent: string,
+  tracestate?: string
+): Promise<{ response?: WorkflowResponse; error?: OpacityError }> {
+  return toResult(() =>
+    NativeOpacity.getInternalWithContext(name, traceparent, params, tracestate)
+  );
+}
+
+async function toResult(
+  call: () => Promise<Object>
+): Promise<{ response?: WorkflowResponse; error?: OpacityError }> {
   try {
-    let res = await NativeOpacity.getInternal(name, params);
+    let res = await call();
     return {
       response: res as WorkflowResponse,
     };
