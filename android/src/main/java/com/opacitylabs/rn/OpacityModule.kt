@@ -69,8 +69,33 @@ class OpacityModule(private val reactContext: ReactApplicationContext) :
   }
 
   override fun getInternal(name: String, params: ReadableMap?, promise: Promise) {
+    runGet(name, params, null, null, promise)
+  }
+
+  override fun getInternalWithContext(
+    name: String,
+    traceparent: String,
+    params: ReadableMap?,
+    tracestate: String?,
+    promise: Promise
+  ) {
+    runGet(name, params, traceparent, tracestate, promise)
+  }
+
+  private fun runGet(
+    name: String,
+    params: ReadableMap?,
+    traceparent: String?,
+    tracestate: String?,
+    promise: Promise
+  ) {
     CoroutineScope(Dispatchers.IO).launch {
-      val res = OpacityCore.get(name, params?.toHashMap())
+      val res =
+        if (traceparent != null) {
+          OpacityCore.getWithContext(name, params?.toHashMap(), traceparent, tracestate)
+        } else {
+          OpacityCore.get(name, params?.toHashMap())
+        }
       res.fold(
         onSuccess = { value ->
           run {

@@ -14,6 +14,14 @@ export interface Spec extends TurboModule {
     grafanaApiToken: string
   ): Promise<void>;
   getInternal(name: string, params?: Object): Promise<Object>;
+  // `traceparent` is required, so it precedes the optional args rather than
+  // mirroring the public `getWithContext` argument order.
+  getInternalWithContext(
+    name: string,
+    traceparent: string,
+    params?: Object,
+    tracestate?: string
+  ): Promise<Object>;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('OpacityModule');

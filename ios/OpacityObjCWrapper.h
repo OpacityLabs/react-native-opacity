@@ -24,6 +24,14 @@ typedef NS_ENUM(NSInteger, OpacityEnvironment) {
      andParams:(NSDictionary *)params
     completion:(void (^)(NSDictionary *res, NSError *error))completion;
 
+// Runs the flow joined to the caller's W3C trace. `traceparent` is required
+// (pass a valid W3C traceparent); `tracestate` is optional and may be nil.
++ (void)getWithContext:(NSString *)name
+             andParams:(NSDictionary *)params
+        andTraceparent:(NSString *)traceparent
+         andTracestate:(NSString *)tracestate
+            completion:(void (^)(NSDictionary *res, NSError *error))completion;
+
 + (NSString *)getApiVersion;
 
 @end
