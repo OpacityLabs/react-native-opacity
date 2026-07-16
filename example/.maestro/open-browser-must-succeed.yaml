@@ -1,0 +1,7 @@
+appId: opacity.example
+---
+- launchApp
+- tapOn: "test:open_browser_must_succeed"
+- extendedWaitUntil:
+    visible: "Success"
+    timeout: 20000
