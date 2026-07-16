@@ -1,4 +1,4 @@
-import Opacity from './NativeOpacity';
+import NativeOpacity from './NativeOpacity';
 
 export class OpacityError extends Error {
   code: string;
@@ -51,7 +51,7 @@ export async function init({
   shouldShowErrorsInWebView?: boolean;
 }): Promise<void> {
   try {
-    let res = await Opacity.init(
+    let res = await NativeOpacity.init(
       apiKey,
       dryRun,
       environment,
@@ -60,6 +60,7 @@ export async function init({
     return res;
   } catch (e) {
     console.error('Could not initialize OpacitySDK', e);
+    throw e;
   }
 }
 
@@ -73,7 +74,7 @@ export async function initializeOpenTelemetry({
   grafanaApiToken: string;
 }): Promise<void> {
   try {
-    let res = await Opacity.initializeOpenTelemetry(
+    let res = await NativeOpacity.initializeOpenTelemetry(
       openTelemetryEndpoint,
       grafanaInstanceId,
       grafanaApiToken
@@ -103,7 +104,7 @@ export async function get(
   params?: Record<string, any>
 ): Promise<{ response?: WorkflowResponse; error?: OpacityError }> {
   try {
-    let res = await Opacity.getInternal(name, params);
+    let res = await NativeOpacity.getInternal(name, params);
     return {
       response: res as WorkflowResponse,
     };
