@@ -2,7 +2,7 @@ appId: opacity.example
 ---
 - launchApp
 - extendedWaitUntil:
-    visible: "test:open_browser_must_succeed"
+    visible: "SDK Initialized!"
     timeout: 30000
 - tapOn: "test:open_browser_must_succeed"
 - extendedWaitUntil:
