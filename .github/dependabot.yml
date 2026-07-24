@@ -1,0 +1,18 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "bundler"
+    directory: "/example"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "gradle"
+    directory: "/android"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "gradle"
+    directory: "/example/android"
+    schedule:
+      interval: "daily"
