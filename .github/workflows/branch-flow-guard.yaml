@@ -1,0 +1,41 @@
+name: Branch flow guard
+
+# -----------------------------------------------------------------------------
+# Enforces the branching strategy: dev -> staging -> main.
+#   * PRs into `main`    must originate from `staging`
+#   * PRs into `staging` must originate from `dev`
+#
+# Add this workflow's check as a REQUIRED status check on the `main` and
+# `staging` branch rules so a non-conforming PR cannot be merged.
+#
+# Emergency changes: a repo admin may temporarily make this check non-required
+# (per the Change Management Plan emergency procedure) to merge a hotfix.
+#
+# This file is standardized and identical across all in-scope repos.
+# -----------------------------------------------------------------------------
+
+on:
+  pull_request:
+    branches:
+      - main
+      - staging
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce dev -> staging -> main
+        env:
+          BASE: ${{ github.base_ref }}
+          HEAD: ${{ github.head_ref }}
+        run: |
+          case "$BASE" in
+            main)    expected="staging" ;;
+            staging) expected="dev" ;;
+            *)       echo "No branch-flow rule for base '$BASE'; skipping."; exit 0 ;;
+          esac
+          if [ "$HEAD" != "$expected" ]; then
+            echo "::error::Branch flow violation: PRs into '$BASE' must come from '$expected', but this PR is from '$HEAD'. The required flow is dev -> staging -> main."
+            exit 1
+          fi
+          echo "OK: '$HEAD' -> '$BASE' follows the dev -> staging -> main flow."
