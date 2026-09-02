@@ -1,0 +1,8 @@
+# CODEOWNERS — required reviewers for this repository.
+#
+# The org ruleset on `main` requires an approving review from a code owner.
+# Listed accounts must have write access or GitHub silently ignores them.
+# An approval from ANY one listed owner satisfies the requirement, and an
+# author cannot approve their own pull request.
+
+*                       @oscar-opacity @adrianopacity
