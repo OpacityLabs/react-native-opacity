@@ -158,10 +158,28 @@ jobs:
               return nodes[0].get("identifier") or f"{team}-{number}"
 
 
+          DEPENDABOT_AUTHORS = ("dependabot[bot]", "dependabot-preview[bot]")
+
+
+          def pull_request_author():
+              path = os.environ.get("GITHUB_EVENT_PATH")
+              if not path:
+                  return None
+              try:
+                  with open(path) as handle:
+                      event = json.load(handle)
+              except (OSError, json.JSONDecodeError):
+                  return None
+              return ((event.get("pull_request") or {}).get("user") or {}).get("login")
+
+
           def check_first_hop(base, head, body, api_key, lookup):
+              # The branch name is not proof. Anyone can open dependabot/manual-change.
               if re.fullmatch(r"dependabot/.+", head) or re.fullmatch(r"dependabot-preview/.+", head):
-                  print(f"OK: Dependabot branch '{head}' may open this pull request without a Linear issue.")
-                  return 0
+                  author = pull_request_author()
+                  if author in DEPENDABOT_AUTHORS:
+                      print(f"OK: Dependabot pull request from '{head}' needs no Linear issue.")
+                      return 0
 
               lowered = head.lower()
               if lowered == "nolinear" or lowered.startswith("nolinear/"):
@@ -255,7 +273,9 @@ jobs:
 
 
           def field_present(body, label):
-              pattern = rf"(?m)^[ \t>*_-]*{re.escape(label)}:[ \t>*_-]*\S"
+              # The value has to be more than a Markdown marker. **Result:** and
+              # Result: * are empty. \S treats the closing asterisk as content.
+              pattern = rf"(?m)^[ \t>*_-]*{re.escape(label)}:[ \t>*_-]*[^\s>*_-]"
               return re.search(pattern, body) is not None
 
 
@@ -268,7 +288,7 @@ jobs:
                   if not field_present(body, label):
                       missing.append(label)
               checkbox = re.search(
-                  r"(?m)^[ \t]*[-*][ \t]+\[[xX]\][ \t]+I tested the changes currently on staging[ \t]*$",
+                  r"(?m)^[ \t]*[-*][ \t]+\[[xX]\][ \t]+I tested the changes currently on staging[ \t]*\r?$",
                   body,
               )
               if checkbox is None:
@@ -460,10 +480,28 @@ jobs:
               return nodes[0].get("identifier") or f"{team}-{number}"
 
 
+          DEPENDABOT_AUTHORS = ("dependabot[bot]", "dependabot-preview[bot]")
+
+
+          def pull_request_author():
+              path = os.environ.get("GITHUB_EVENT_PATH")
+              if not path:
+                  return None
+              try:
+                  with open(path) as handle:
+                      event = json.load(handle)
+              except (OSError, json.JSONDecodeError):
+                  return None
+              return ((event.get("pull_request") or {}).get("user") or {}).get("login")
+
+
           def check_first_hop(base, head, body, api_key, lookup):
+              # The branch name is not proof. Anyone can open dependabot/manual-change.
               if re.fullmatch(r"dependabot/.+", head) or re.fullmatch(r"dependabot-preview/.+", head):
-                  print(f"OK: Dependabot branch '{head}' may open this pull request without a Linear issue.")
-                  return 0
+                  author = pull_request_author()
+                  if author in DEPENDABOT_AUTHORS:
+                      print(f"OK: Dependabot pull request from '{head}' needs no Linear issue.")
+                      return 0
 
               lowered = head.lower()
               if lowered == "nolinear" or lowered.startswith("nolinear/"):
@@ -557,7 +595,9 @@ jobs:
 
 
           def field_present(body, label):
-              pattern = rf"(?m)^[ \t>*_-]*{re.escape(label)}:[ \t>*_-]*\S"
+              # The value has to be more than a Markdown marker. **Result:** and
+              # Result: * are empty. \S treats the closing asterisk as content.
+              pattern = rf"(?m)^[ \t>*_-]*{re.escape(label)}:[ \t>*_-]*[^\s>*_-]"
               return re.search(pattern, body) is not None
 
 
@@ -570,7 +610,7 @@ jobs:
                   if not field_present(body, label):
                       missing.append(label)
               checkbox = re.search(
-                  r"(?m)^[ \t]*[-*][ \t]+\[[xX]\][ \t]+I tested the changes currently on staging[ \t]*$",
+                  r"(?m)^[ \t]*[-*][ \t]+\[[xX]\][ \t]+I tested the changes currently on staging[ \t]*\r?$",
                   body,
               )
               if checkbox is None:
