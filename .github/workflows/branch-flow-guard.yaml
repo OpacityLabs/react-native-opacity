@@ -1,41 +1,86 @@
 name: Branch flow guard
-
-# -----------------------------------------------------------------------------
-# Enforces the branching strategy: dev -> staging -> main.
-#   * PRs into `main`    must originate from `staging`
-#   * PRs into `staging` must originate from `dev`
+# Enforces dev -> staging -> main, and checks the change record on the first hop.
 #
-# Add this workflow's check as a REQUIRED status check on the `main` and
-# `staging` branch rules so a non-conforming PR cannot be merged.
+#   * PRs into main must originate from staging
+#   * PRs into staging must originate from dev
+#   * PRs into dev must name a real Linear issue, use nolinear/<reason> with a
+#     pull request description, or come from Dependabot
 #
-# Emergency changes: a repo admin may temporarily make this check non-required
-# (per the Change Management Plan emergency procedure) to merge a hotfix.
+# The GitHub Linear app only links a branch. LINEAR_API_KEY is what lets this
+# job ask Linear whether that issue exists. A missing secret fails closed.
+# The value is the key itself. Linear personal API keys are not Bearer tokens.
 #
-# This file is standardized and identical across all in-scope repos.
-# -----------------------------------------------------------------------------
-
+# A back-merge (main into dev, main into staging, staging into dev) needs no
+# ticket. The pull request that landed the change already carried one.
+#
+# staging-test runs only when the head branch is staging and the repository
+# variable REQUIRE_STAGING_TEST is true. A skipped job satisfies a required
+# check. The head branch of a pull request never changes and the variable is
+# read when the job starts, so neither condition goes stale on a rerun. The
+# base branch can change (retarget), so the script reads it live. The record
+# has to name the current head SHA, so a later commit invalidates it. edited is
+# listed so updating the description runs the check again.
+#
+# The jobs run as pull_request_target. That event runs in the context of the
+# repository default branch, so this file and the script it checks out both
+# come from there. A pull request cannot replace the check with one that skips
+# the record. Both jobs read the pull request from the GitHub API before
+# choosing a rule: base branch, head branch, head SHA, author, and description.
+# The author fills the staging record in the description. This check only
+# reads it. Open the promotion with ?template=to-main.md to get the fields.
+#
+# The org ruleset Branch Flow Guard Status Check decides which jobs are
+# required. This file has to be on the default branch of every release-pipeline
+# repo before that ruleset includes dev or staging-test.
+#
+# Emergency: a repo admin may temporarily make the check non-required.
 on:
-  pull_request:
+  pull_request_target:
+    types: [opened, synchronize, reopened, edited]
     branches:
       - main
       - staging
+      - dev
+
+permissions:
+  contents: read
+  pull-requests: read
 
 jobs:
   guard:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
+      - name: Check out the guard script from the default branch
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          sparse-checkout: .github/scripts
+          persist-credentials: false
       - name: Enforce dev -> staging -> main
         env:
-          BASE: ${{ github.base_ref }}
-          HEAD: ${{ github.head_ref }}
-        run: |
-          case "$BASE" in
-            main)    expected="staging" ;;
-            staging) expected="dev" ;;
-            *)       echo "No branch-flow rule for base '$BASE'; skipping."; exit 0 ;;
-          esac
-          if [ "$HEAD" != "$expected" ]; then
-            echo "::error::Branch flow violation: PRs into '$BASE' must come from '$expected', but this PR is from '$HEAD'. The required flow is dev -> staging -> main."
-            exit 1
-          fi
-          echo "OK: '$HEAD' -> '$BASE' follows the dev -> staging -> main flow."
+          MODE: guard
+          FLOW: three
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: python3 .github/scripts/branch_flow_guard.py
+
+  staging-test:
+    if: github.event.pull_request.head.ref == 'staging' && vars.REQUIRE_STAGING_TEST == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out the guard script from the default branch
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          sparse-checkout: .github/scripts
+          persist-credentials: false
+      - name: Record the staging test
+        env:
+          MODE: staging-test
+          REQUIRE_STAGING_TEST: ${{ vars.REQUIRE_STAGING_TEST }}
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: python3 .github/scripts/branch_flow_guard.py
