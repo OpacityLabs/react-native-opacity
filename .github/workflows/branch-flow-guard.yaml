@@ -10,9 +10,24 @@ name: Branch flow guard
 # job ask Linear whether that issue exists. A missing secret fails closed.
 # The value is the key itself. Linear personal API keys are not Bearer tokens.
 #
-# staging-test passes immediately unless the pull request is staging -> main
-# and the repository variable REQUIRE_STAGING_TEST is true. edited is listed
-# so ticking the box runs the check again.
+# A back-merge (main into dev, main into staging, staging into dev) needs no
+# ticket. The pull request that landed the change already carried one.
+#
+# staging-test runs only when the head branch is staging and the repository
+# variable REQUIRE_STAGING_TEST is true. A skipped job satisfies a required
+# check. The head branch of a pull request never changes and the variable is
+# read when the job starts, so neither condition goes stale on a rerun. The
+# base branch can change (retarget), so the script reads it live. The record
+# has to name the current head SHA, so a later commit invalidates it. edited is
+# listed so updating the description runs the check again.
+#
+# The jobs run as pull_request_target. That event runs in the context of the
+# repository default branch, so this file and the script it checks out both
+# come from there. A pull request cannot replace the check with one that skips
+# the record. Both jobs read the pull request from the GitHub API before
+# choosing a rule: base branch, head branch, head SHA, author, and description.
+# The author fills the staging record in the description. This check only
+# reads it. Open the promotion with ?template=to-main.md to get the fields.
 #
 # The org ruleset Branch Flow Guard Status Check decides which jobs are
 # required. This file has to be on the default branch of every release-pipeline
@@ -20,7 +35,7 @@ name: Branch flow guard
 #
 # Emergency: a repo admin may temporarily make the check non-required.
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, synchronize, reopened, edited]
     branches:
       - main
@@ -29,649 +44,43 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   guard:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - name: Check out the guard script from the default branch
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          sparse-checkout: .github/scripts
+          persist-credentials: false
       - name: Enforce dev -> staging -> main
         env:
           MODE: guard
           FLOW: three
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
-        run: |
-          python3 - << 'LINEAR_GUARD_PY'
-          """Change-record check for the branch-flow guard.
-
-          The GitHub Linear app only links a branch when the name contains an issue id.
-          It does not tell Actions whether that issue exists. This script asks Linear.
-          """
-
-          import json
-          import os
-          import re
-          import sys
-          import urllib.error
-          import urllib.request
-
-          LINEAR_URL = "https://api.linear.app/graphql"
-          QUERY = """
-          query($key: String!, $num: Float!) {
-            issues(
-              includeArchived: true
-              filter: { team: { key: { eq: $key } }, number: { eq: $num } }
-            ) {
-              nodes { identifier }
-            }
-          }
-          """
-
-          ATTESTATION = """Staging URL: https://...
-          Exercised: what you tried on the current staging deploy
-          Result: what happened
-
-          - [x] I tested the changes currently on staging"""
-
-
-          class LinearError(Exception):
-              pass
-
-
-          def extract_keys(head):
-              """Return TEAM-123 keys in left-to-right order.
-
-              The team key is the run of letters immediately before -123, and it has to
-              start on a boundary. That keeps adrianp/ENG-149-title and rejects a key
-              glued onto the previous word.
-              """
-              found = []
-              seen = set()
-              for match in re.finditer(r"-(\d+)", head):
-                  end = match.start()
-                  start = end
-                  while start > 0 and head[start - 1].isalpha():
-                      start -= 1
-                  team = head[start:end]
-                  if not (2 <= len(team) <= 16):
-                      continue
-                  if start > 0 and head[start - 1].isalnum():
-                      continue
-                  key = f"{team.upper()}-{match.group(1)}"
-                  if key not in seen:
-                      seen.add(key)
-                      found.append((team.upper(), match.group(1), key))
-              return found
-
-
-          def linear_lookup(api_key, team, number):
-              payload = json.dumps(
-                  {"query": QUERY, "variables": {"key": team, "num": int(number)}}
-              ).encode()
-              request = urllib.request.Request(
-                  LINEAR_URL,
-                  data=payload,
-                  headers={
-                      "Authorization": api_key,
-                      "Content-Type": "application/json",
-                      "Accept": "application/json",
-                  },
-                  method="POST",
-              )
-              try:
-                  with urllib.request.urlopen(request, timeout=20) as response:
-                      raw = response.read().decode()
-              except urllib.error.HTTPError as error:
-                  print(
-                      f"::error::Linear API returned HTTP {error.code} while checking {team}-{number}.",
-                      file=sys.stderr,
-                  )
-                  raise LinearError(str(error.code)) from error
-              except urllib.error.URLError as error:
-                  print(
-                      f"::error::Linear API request failed while checking {team}-{number}.",
-                      file=sys.stderr,
-                  )
-                  raise LinearError("network") from error
-
-              try:
-                  data = json.loads(raw)
-              except json.JSONDecodeError as error:
-                  print(
-                      f"::error::Linear API returned a response that was not JSON while checking {team}-{number}.",
-                      file=sys.stderr,
-                  )
-                  raise LinearError("json") from error
-
-              errors = data.get("errors") or []
-              if errors:
-                  message = errors[0].get("message") or "unknown error"
-                  print(
-                      f"::error::Linear rejected the lookup for {team}-{number}: {message}",
-                      file=sys.stderr,
-                  )
-                  raise LinearError(message)
-
-              nodes = ((data.get("data") or {}).get("issues") or {}).get("nodes") or []
-              if not nodes:
-                  return None
-              return nodes[0].get("identifier") or f"{team}-{number}"
-
-
-          DEPENDABOT_AUTHORS = ("dependabot[bot]", "dependabot-preview[bot]")
-
-
-          def pull_request_author():
-              path = os.environ.get("GITHUB_EVENT_PATH")
-              if not path:
-                  return None
-              try:
-                  with open(path) as handle:
-                      event = json.load(handle)
-              except (OSError, json.JSONDecodeError):
-                  return None
-              return ((event.get("pull_request") or {}).get("user") or {}).get("login")
-
-
-          def check_first_hop(base, head, body, api_key, lookup):
-              # The branch name is not proof. Anyone can open dependabot/manual-change.
-              if re.fullmatch(r"dependabot/.+", head) or re.fullmatch(r"dependabot-preview/.+", head):
-                  author = pull_request_author()
-                  if author in DEPENDABOT_AUTHORS:
-                      print(f"OK: Dependabot pull request from '{head}' needs no Linear issue.")
-                      return 0
-
-              lowered = head.lower()
-              if lowered == "nolinear" or lowered.startswith("nolinear/"):
-                  reason = head.split("/", 1)[1] if "/" in head else ""
-                  if not reason.strip():
-                      print(
-                          "::error::Use nolinear/<short-reason>. The text after the slash is the change name.",
-                          file=sys.stderr,
-                      )
-                      return 1
-                  if not body.strip():
-                      print(
-                          "::error::nolinear/ branches are the no-ticket path, so the pull request description is the change record. Describe what this change is and why.",
-                          file=sys.stderr,
-                      )
-                      return 1
-                  print(f"OK: '{head}' is a no-ticket change and the pull request has a description.")
-                  return 0
-
-              keys = extract_keys(head)
-              if not keys:
-                  print(
-                      f"::error::Pull requests into '{base}' must come from a branch that names a real Linear issue (for example adrianp/ENG-149-short-title), from nolinear/<reason> with a pull request description, or from Dependabot. '{head}' does not.",
-                      file=sys.stderr,
-                  )
-                  return 1
-
-              if not api_key.strip():
-                  print(
-                      "::error::LINEAR_API_KEY is not available to this repository, so the Linear issue cannot be verified.",
-                      file=sys.stderr,
-                  )
-                  return 1
-
-              checked = []
-              for team, number, key in keys:
-                  checked.append(key)
-                  try:
-                      identifier = lookup(api_key, team, number)
-                  except LinearError:
-                      return 1
-                  if identifier:
-                      print(f"OK: Linear issue {identifier} exists.")
-                      return 0
-
-              joined = ", ".join(checked)
-              print(
-                  f"::error::None of the Linear issue keys in '{head}' exist ({joined}). Create the issue, or rename the branch to nolinear/<reason> and describe the change in the pull request.",
-                  file=sys.stderr,
-              )
-              return 1
-
-
-          def exact(base, head, expected, flow_name):
-              if head != expected:
-                  print(
-                      f"::error::Branch flow violation: PRs into '{base}' must come from '{expected}', but this PR is from '{head}'. The required flow is {flow_name}.",
-                      file=sys.stderr,
-                  )
-                  return 1
-              print(f"OK: '{head}' -> '{base}' follows the {flow_name} flow.")
-              return 0
-
-
-          def enforce(flow, base, head, body, api_key, lookup=linear_lookup):
-              if not head:
-                  print("::error::This pull request has no head branch name.", file=sys.stderr)
-                  return 1
-              if flow == "three":
-                  if base == "main":
-                      return exact(base, head, "staging", "dev -> staging -> main")
-                  if base == "staging":
-                      return exact(base, head, "dev", "dev -> staging -> main")
-                  if base == "dev":
-                      return check_first_hop(base, head, body, api_key, lookup)
-              elif flow == "two":
-                  if base == "main":
-                      return exact(base, head, "staging", "staging -> main")
-                  if base == "staging":
-                      return check_first_hop(base, head, body, api_key, lookup)
-              elif flow == "zorya":
-                  if base != "main":
-                      print(f"::error::Zorya deploys only from main; PR base was '{base}'.", file=sys.stderr)
-                      return 1
-                  return check_first_hop(base, head, body, api_key, lookup)
-              else:
-                  print(f"::error::Unknown branch flow '{flow}'.", file=sys.stderr)
-                  return 1
-              print(f"No branch-flow rule for base '{base}'; skipping.")
-              return 0
-
-
-          def field_present(body, label):
-              # The value has to be more than a Markdown marker. **Result:** and
-              # Result: * are empty. \S treats the closing asterisk as content.
-              pattern = rf"(?m)^[ \t>*_-]*{re.escape(label)}:[ \t>*_-]*[^\s>*_-]"
-              return re.search(pattern, body) is not None
-
-
-          def staging_test(base, head, body, required, actor):
-              if base != "main" or head != "staging" or required != "true":
-                  print("Staging attestation is not required for this pull request.")
-                  return 0
-              missing = []
-              for label in ("Staging URL", "Exercised", "Result"):
-                  if not field_present(body, label):
-                      missing.append(label)
-              checkbox = re.search(
-                  r"(?m)^[ \t]*[-*][ \t]+\[[xX]\][ \t]+I tested the changes currently on staging[ \t]*\r?$",
-                  body,
-              )
-              if checkbox is None:
-                  missing.append("the staging checkbox")
-              if missing:
-                  print(
-                      "::error::This pull request promotes staging to main. The description is missing: "
-                      + ", ".join(missing)
-                      + ".",
-                      file=sys.stderr,
-                  )
-                  print("Add this block, tick the box, and the check runs again:")
-                  print(ATTESTATION)
-                  return 1
-              from datetime import datetime, timezone
-
-              now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-              print(f"Staging attestation accepted by {actor} at {now}.")
-              return 0
-
-
-          def pull_request_body():
-              """Prefer the event file. A pull request body can be larger than an env var."""
-              path = os.environ.get("GITHUB_EVENT_PATH")
-              if path:
-                  try:
-                      with open(path) as handle:
-                          event = json.load(handle)
-                  except (OSError, json.JSONDecodeError):
-                      event = None
-                  if event is not None:
-                      body = (event.get("pull_request") or {}).get("body")
-                      if body is not None:
-                          return body
-              return os.environ.get("PR_BODY") or ""
-
-
-          def main():
-              mode = os.environ.get("MODE", "guard")
-              base = os.environ.get("BASE") or os.environ.get("GITHUB_BASE_REF") or ""
-              head = os.environ.get("HEAD") or os.environ.get("GITHUB_HEAD_REF") or ""
-              body = pull_request_body()
-              if mode == "staging-test":
-                  code = staging_test(
-                      base,
-                      head,
-                      body,
-                      os.environ.get("REQUIRE_STAGING_TEST", ""),
-                      os.environ.get("ACTOR") or os.environ.get("GITHUB_ACTOR") or "",
-                  )
-              else:
-                  code = enforce(
-                      os.environ.get("FLOW", ""),
-                      base,
-                      head,
-                      body,
-                      os.environ.get("LINEAR_API_KEY", ""),
-                  )
-              return code
-
-
-          if __name__ == "__main__":
-              sys.exit(main())
-          LINEAR_GUARD_PY
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: python3 .github/scripts/branch_flow_guard.py
 
   staging-test:
+    if: github.event.pull_request.head.ref == 'staging' && vars.REQUIRE_STAGING_TEST == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - name: Check out the guard script from the default branch
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          sparse-checkout: .github/scripts
+          persist-credentials: false
       - name: Record the staging test
         env:
           MODE: staging-test
           REQUIRE_STAGING_TEST: ${{ vars.REQUIRE_STAGING_TEST }}
-        run: |
-          python3 - << 'LINEAR_GUARD_PY'
-          """Change-record check for the branch-flow guard.
-
-          The GitHub Linear app only links a branch when the name contains an issue id.
-          It does not tell Actions whether that issue exists. This script asks Linear.
-          """
-
-          import json
-          import os
-          import re
-          import sys
-          import urllib.error
-          import urllib.request
-
-          LINEAR_URL = "https://api.linear.app/graphql"
-          QUERY = """
-          query($key: String!, $num: Float!) {
-            issues(
-              includeArchived: true
-              filter: { team: { key: { eq: $key } }, number: { eq: $num } }
-            ) {
-              nodes { identifier }
-            }
-          }
-          """
-
-          ATTESTATION = """Staging URL: https://...
-          Exercised: what you tried on the current staging deploy
-          Result: what happened
-
-          - [x] I tested the changes currently on staging"""
-
-
-          class LinearError(Exception):
-              pass
-
-
-          def extract_keys(head):
-              """Return TEAM-123 keys in left-to-right order.
-
-              The team key is the run of letters immediately before -123, and it has to
-              start on a boundary. That keeps adrianp/ENG-149-title and rejects a key
-              glued onto the previous word.
-              """
-              found = []
-              seen = set()
-              for match in re.finditer(r"-(\d+)", head):
-                  end = match.start()
-                  start = end
-                  while start > 0 and head[start - 1].isalpha():
-                      start -= 1
-                  team = head[start:end]
-                  if not (2 <= len(team) <= 16):
-                      continue
-                  if start > 0 and head[start - 1].isalnum():
-                      continue
-                  key = f"{team.upper()}-{match.group(1)}"
-                  if key not in seen:
-                      seen.add(key)
-                      found.append((team.upper(), match.group(1), key))
-              return found
-
-
-          def linear_lookup(api_key, team, number):
-              payload = json.dumps(
-                  {"query": QUERY, "variables": {"key": team, "num": int(number)}}
-              ).encode()
-              request = urllib.request.Request(
-                  LINEAR_URL,
-                  data=payload,
-                  headers={
-                      "Authorization": api_key,
-                      "Content-Type": "application/json",
-                      "Accept": "application/json",
-                  },
-                  method="POST",
-              )
-              try:
-                  with urllib.request.urlopen(request, timeout=20) as response:
-                      raw = response.read().decode()
-              except urllib.error.HTTPError as error:
-                  print(
-                      f"::error::Linear API returned HTTP {error.code} while checking {team}-{number}.",
-                      file=sys.stderr,
-                  )
-                  raise LinearError(str(error.code)) from error
-              except urllib.error.URLError as error:
-                  print(
-                      f"::error::Linear API request failed while checking {team}-{number}.",
-                      file=sys.stderr,
-                  )
-                  raise LinearError("network") from error
-
-              try:
-                  data = json.loads(raw)
-              except json.JSONDecodeError as error:
-                  print(
-                      f"::error::Linear API returned a response that was not JSON while checking {team}-{number}.",
-                      file=sys.stderr,
-                  )
-                  raise LinearError("json") from error
-
-              errors = data.get("errors") or []
-              if errors:
-                  message = errors[0].get("message") or "unknown error"
-                  print(
-                      f"::error::Linear rejected the lookup for {team}-{number}: {message}",
-                      file=sys.stderr,
-                  )
-                  raise LinearError(message)
-
-              nodes = ((data.get("data") or {}).get("issues") or {}).get("nodes") or []
-              if not nodes:
-                  return None
-              return nodes[0].get("identifier") or f"{team}-{number}"
-
-
-          DEPENDABOT_AUTHORS = ("dependabot[bot]", "dependabot-preview[bot]")
-
-
-          def pull_request_author():
-              path = os.environ.get("GITHUB_EVENT_PATH")
-              if not path:
-                  return None
-              try:
-                  with open(path) as handle:
-                      event = json.load(handle)
-              except (OSError, json.JSONDecodeError):
-                  return None
-              return ((event.get("pull_request") or {}).get("user") or {}).get("login")
-
-
-          def check_first_hop(base, head, body, api_key, lookup):
-              # The branch name is not proof. Anyone can open dependabot/manual-change.
-              if re.fullmatch(r"dependabot/.+", head) or re.fullmatch(r"dependabot-preview/.+", head):
-                  author = pull_request_author()
-                  if author in DEPENDABOT_AUTHORS:
-                      print(f"OK: Dependabot pull request from '{head}' needs no Linear issue.")
-                      return 0
-
-              lowered = head.lower()
-              if lowered == "nolinear" or lowered.startswith("nolinear/"):
-                  reason = head.split("/", 1)[1] if "/" in head else ""
-                  if not reason.strip():
-                      print(
-                          "::error::Use nolinear/<short-reason>. The text after the slash is the change name.",
-                          file=sys.stderr,
-                      )
-                      return 1
-                  if not body.strip():
-                      print(
-                          "::error::nolinear/ branches are the no-ticket path, so the pull request description is the change record. Describe what this change is and why.",
-                          file=sys.stderr,
-                      )
-                      return 1
-                  print(f"OK: '{head}' is a no-ticket change and the pull request has a description.")
-                  return 0
-
-              keys = extract_keys(head)
-              if not keys:
-                  print(
-                      f"::error::Pull requests into '{base}' must come from a branch that names a real Linear issue (for example adrianp/ENG-149-short-title), from nolinear/<reason> with a pull request description, or from Dependabot. '{head}' does not.",
-                      file=sys.stderr,
-                  )
-                  return 1
-
-              if not api_key.strip():
-                  print(
-                      "::error::LINEAR_API_KEY is not available to this repository, so the Linear issue cannot be verified.",
-                      file=sys.stderr,
-                  )
-                  return 1
-
-              checked = []
-              for team, number, key in keys:
-                  checked.append(key)
-                  try:
-                      identifier = lookup(api_key, team, number)
-                  except LinearError:
-                      return 1
-                  if identifier:
-                      print(f"OK: Linear issue {identifier} exists.")
-                      return 0
-
-              joined = ", ".join(checked)
-              print(
-                  f"::error::None of the Linear issue keys in '{head}' exist ({joined}). Create the issue, or rename the branch to nolinear/<reason> and describe the change in the pull request.",
-                  file=sys.stderr,
-              )
-              return 1
-
-
-          def exact(base, head, expected, flow_name):
-              if head != expected:
-                  print(
-                      f"::error::Branch flow violation: PRs into '{base}' must come from '{expected}', but this PR is from '{head}'. The required flow is {flow_name}.",
-                      file=sys.stderr,
-                  )
-                  return 1
-              print(f"OK: '{head}' -> '{base}' follows the {flow_name} flow.")
-              return 0
-
-
-          def enforce(flow, base, head, body, api_key, lookup=linear_lookup):
-              if not head:
-                  print("::error::This pull request has no head branch name.", file=sys.stderr)
-                  return 1
-              if flow == "three":
-                  if base == "main":
-                      return exact(base, head, "staging", "dev -> staging -> main")
-                  if base == "staging":
-                      return exact(base, head, "dev", "dev -> staging -> main")
-                  if base == "dev":
-                      return check_first_hop(base, head, body, api_key, lookup)
-              elif flow == "two":
-                  if base == "main":
-                      return exact(base, head, "staging", "staging -> main")
-                  if base == "staging":
-                      return check_first_hop(base, head, body, api_key, lookup)
-              elif flow == "zorya":
-                  if base != "main":
-                      print(f"::error::Zorya deploys only from main; PR base was '{base}'.", file=sys.stderr)
-                      return 1
-                  return check_first_hop(base, head, body, api_key, lookup)
-              else:
-                  print(f"::error::Unknown branch flow '{flow}'.", file=sys.stderr)
-                  return 1
-              print(f"No branch-flow rule for base '{base}'; skipping.")
-              return 0
-
-
-          def field_present(body, label):
-              # The value has to be more than a Markdown marker. **Result:** and
-              # Result: * are empty. \S treats the closing asterisk as content.
-              pattern = rf"(?m)^[ \t>*_-]*{re.escape(label)}:[ \t>*_-]*[^\s>*_-]"
-              return re.search(pattern, body) is not None
-
-
-          def staging_test(base, head, body, required, actor):
-              if base != "main" or head != "staging" or required != "true":
-                  print("Staging attestation is not required for this pull request.")
-                  return 0
-              missing = []
-              for label in ("Staging URL", "Exercised", "Result"):
-                  if not field_present(body, label):
-                      missing.append(label)
-              checkbox = re.search(
-                  r"(?m)^[ \t]*[-*][ \t]+\[[xX]\][ \t]+I tested the changes currently on staging[ \t]*\r?$",
-                  body,
-              )
-              if checkbox is None:
-                  missing.append("the staging checkbox")
-              if missing:
-                  print(
-                      "::error::This pull request promotes staging to main. The description is missing: "
-                      + ", ".join(missing)
-                      + ".",
-                      file=sys.stderr,
-                  )
-                  print("Add this block, tick the box, and the check runs again:")
-                  print(ATTESTATION)
-                  return 1
-              from datetime import datetime, timezone
-
-              now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-              print(f"Staging attestation accepted by {actor} at {now}.")
-              return 0
-
-
-          def pull_request_body():
-              """Prefer the event file. A pull request body can be larger than an env var."""
-              path = os.environ.get("GITHUB_EVENT_PATH")
-              if path:
-                  try:
-                      with open(path) as handle:
-                          event = json.load(handle)
-                  except (OSError, json.JSONDecodeError):
-                      event = None
-                  if event is not None:
-                      body = (event.get("pull_request") or {}).get("body")
-                      if body is not None:
-                          return body
-              return os.environ.get("PR_BODY") or ""
-
-
-          def main():
-              mode = os.environ.get("MODE", "guard")
-              base = os.environ.get("BASE") or os.environ.get("GITHUB_BASE_REF") or ""
-              head = os.environ.get("HEAD") or os.environ.get("GITHUB_HEAD_REF") or ""
-              body = pull_request_body()
-              if mode == "staging-test":
-                  code = staging_test(
-                      base,
-                      head,
-                      body,
-                      os.environ.get("REQUIRE_STAGING_TEST", ""),
-                      os.environ.get("ACTOR") or os.environ.get("GITHUB_ACTOR") or "",
-                  )
-              else:
-                  code = enforce(
-                      os.environ.get("FLOW", ""),
-                      base,
-                      head,
-                      body,
-                      os.environ.get("LINEAR_API_KEY", ""),
-                  )
-              return code
-
-
-          if __name__ == "__main__":
-              sys.exit(main())
-          LINEAR_GUARD_PY
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: python3 .github/scripts/branch_flow_guard.py
